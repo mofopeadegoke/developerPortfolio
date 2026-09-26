@@ -1,53 +1,30 @@
-import { Github, Linkedin, Mail } from "lucide-react";
+import { profile } from "@/lib/content";
 
+// The footer is a drafting title block: the box in the corner of every
+// engineering drawing that says who drew it and when.
 export function Footer() {
-  const currentYear = new Date().getFullYear();
+  const cells = [
+    { label: "Drawn by", value: profile.fullName, wide: true },
+    { label: "Title", value: `${profile.role}, portfolio` },
+    { label: "Location", value: profile.location },
+    { label: "Revised", value: profile.revised },
+    { label: "Sheet", value: "1 of 1" },
+  ];
 
   return (
-    <footer className="py-8 px-6 border-t border-border">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-foreground">
-              DA<span className="text-primary">.</span>
-            </span>
-            <span className="text-muted-foreground text-sm">
-              &copy; {currentYear} Daniel Adegoke
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <a
-              href="https://github.com/mofopeadegoke"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-colors"
-              aria-label="GitHub"
+    <footer className="pt-6 pb-10">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <dl className="grid grid-cols-2 border-t border-l border-ink text-sm md:grid-cols-[2fr_1.4fr_1.2fr_1fr_0.7fr]">
+          {cells.map((cell) => (
+            <div
+              key={cell.label}
+              className={`border-r border-b border-ink px-3 py-2.5 ${cell.wide ? "col-span-2 md:col-span-1" : ""}`}
             >
-              <Github className="h-5 w-5" />
-            </a>
-            <a
-              href="https://www.linkedin.com/in/mofopefoluwa-daniel-adegoke-abc/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-colors"
-              aria-label="LinkedIn"
-            >
-              <Linkedin className="h-5 w-5" />
-            </a>
-            <a
-              href="mailto:mofopeadegoke@gmail.com"
-              className="text-muted-foreground hover:text-primary transition-colors"
-              aria-label="Email"
-            >
-              <Mail className="h-5 w-5" />
-            </a>
-          </div>
-
-          <p className="text-sm text-muted-foreground">
-            Built with Next.js & Tailwind CSS
-          </p>
-        </div>
+              <dt className="text-xs text-pencil">{cell.label}</dt>
+              <dd className="mt-0.5 font-medium tabular">{cell.value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </footer>
   );

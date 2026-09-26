@@ -1,40 +1,59 @@
 "use client";
 
+import { useEffect, useState, type MouseEvent } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
-  if (!mounted) {
-    return (
-      <Button variant="ghost" size="icon" className="h-9 w-9">
-        <span className="sr-only">Toggle theme</span>
-      </Button>
-    );
-  }
+  const isDark = mounted && resolvedTheme === "dark";
+  const label = isDark ? "Switch to light theme" : "Switch to dark theme";
+
+  const toggle = (event: MouseEvent<HTMLButtonElement>) => {
+    const next = isDark ? "light" : "dark";
+    const apply = () => {
+      // Apply the class ourselves so the view transition captures the new state
+      // immediately; next-themes applies it again in an effect.
+      document.documentElement.classList.toggle("dark", next === "dark");
+      document.documentElement.style.colorScheme = next;
+      setTheme(next);
+    };
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!document.startViewTransition || reduceMotion) {
+      apply();
+      return;
+    }
+
+    // Wipe the new theme in as a circle growing from the button.
+    const { clientX: x, clientY: y } = event;
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    const transition = document.startViewTransition(apply);
+    transition.ready.then(() => {
+      document.documentElement.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+        {
+          duration: 550,
+          easing: "cubic-bezier(0.65, 0, 0.35, 1)",
+          pseudoElement: "::view-transition-new(root)",
+        },
+      );
+    });
+  };
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="h-9 w-9 hover:bg-secondary"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      aria-label="Toggle theme"
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={label}
+      title={label}
+      className="grid h-9 w-9 place-items-center rounded-[3px] text-ink transition-colors hover:bg-ink/8"
     >
-      {theme === "dark" ? (
-        <Sun className="h-4 w-4 text-foreground transition-transform hover:rotate-45" />
-      ) : (
-        <Moon className="h-4 w-4 text-foreground transition-transform hover:-rotate-12" />
-      )}
-      <span className="sr-only">Toggle theme</span>
-    </Button>
+      {mounted && (isDark ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />)}
+    </button>
   );
 }
