@@ -1,199 +1,118 @@
 "use client";
 
-import { ExternalLink, Github, Trophy } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
-const projects = [
-  {
-    title: "Inscribe",
-    description:
-      "A browser-based productivity platform for web note-taking, sketching, reminders, and exports. Features inline web annotations, tagging, search, and multi-format exports (PDF, PNG, Markdown).",
-    technologies: ["React", "Node.js", "PWA", "Accessibility"],
-    image: "/projects/inscribe.jpg",
-    github: "#",
-    live: "#",
-    featured: false,
-  },
-  {
-    title: "Parametric Gear Library",
-    description:
-      "A C++ library for programmatic generation of customizable 3D gear models. Exports directly in STL format, supporting extensive parameterization for rapid prototyping and 3D printing.",
-    technologies: ["C++", "3D Modeling", "STL Export", "OpenSCAD"],
-    image: "/projects/gear-library.jpg",
-    github: "https://github.com/mofopeadegoke/gearGeneration",
-    featured: true,
-  },
-  {
-    title: "Wormhole 3D Simulation",
-    description:
-      "Real-time WebGL visualization simulating wormhole distortion effects using custom shaders, HTML Canvas, and Three.js.",
-    technologies: ["Three.js", "WebGL", "Shaders", "JavaScript"],
-    image: "/projects/wormhole.jpg",
-    github: "https://github.com/mofopeadegoke/threeJsTUnnel",
-    live: "https://three-js-t-unnel.vercel.app/",
-    featured: true,
-  },
-  {
-    title: "AI Automation Server",
-    description:
-      "Backend automation platform built at Technolink using PHP, Node.js, and Dockerized microservices for AI-driven automation systems.",
-    technologies: ["PHP", "Node.js", "Docker", "Microservices"],
-    image: "/projects/ai-server.jpg",
-    featured: false,
-  },
-  {
-    title: "Hackathon Winner Project",
-    description:
-      "Led a 3-person team to first place at Codespace x Couchbase Hackathon by building a scalable data visualization platform within 48 hours.",
-    technologies: ["React", "Couchbase", "Data Visualization"],
-    image: "/projects/hackathon.jpg",
-    github: "https://github.com/mofopeadegoke/TechSpace-Project-Organik",
-    award: "1st Place - Codespace x Couchbase 2023",
-    featured: false,
-  },
-];
+import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { ArrowUpRight, Plus } from "lucide-react";
+import { SectionHeading } from "@/components/section-heading";
+import { ProjectDrawing } from "@/components/project-drawings";
+import { projects } from "@/lib/content";
 
 export function ProjectsSection() {
+  const [open, setOpen] = useState<Set<string>>(() => new Set([projects[0].key]));
+
+  const toggle = (key: string) =>
+    setOpen((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+
   return (
-    <section id="projects" className="py-24 px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="text-primary text-sm font-medium tracking-wider uppercase">
-            Portfolio
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mt-2">
-            Featured Projects
-          </h2>
-        </div>
+    <section
+      id="projects"
+      aria-labelledby="projects-heading"
+      className="border-t border-rule bg-paper-raised py-24 md:py-32"
+    >
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeading id="projects" title="Projects" intro="Things I built outside the day job, from robotics software to a browser extension people rely on." />
 
-        {/* Featured Projects */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-12">
-          {projects
-            .filter((p) => p.featured)
-            .map((project) => (
-              <div
-                key={project.title}
-                className="group relative bg-card rounded-xl border border-border overflow-hidden hover:border-primary/50 transition-all duration-300"
-              >
-                <div className="aspect-video bg-secondary/50 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-6xl font-bold text-primary/20">
-                      {project.title.charAt(0)}
-                    </span>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                    {project.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                    {project.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.technologies.map((tech) => (
-                      <span
-                        key={tech}
-                        className="px-2 py-1 bg-secondary text-secondary-foreground rounded text-xs"
-                      >
-                        {tech}
+        <ul className="border-t border-ink">
+          {projects.map((project) => {
+            const isOpen = open.has(project.key);
+            const panelId = `project-${project.key}`;
+            return (
+              <li key={project.key} className="border-b border-rule">
+                <h3>
+                  <button
+                    type="button"
+                    onClick={() => toggle(project.key)}
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    className="group grid w-full grid-cols-[1fr_auto] items-baseline gap-x-6 gap-y-1 py-6 text-left md:grid-cols-[7rem_1fr_1fr_auto] md:py-7"
+                  >
+                    <span className="order-3 text-sm text-pencil tabular md:order-none">{project.years}</span>
+                    <span className="order-1 md:order-none">
+                      <span className="block font-display text-3xl font-semibold leading-tight transition-colors group-hover:text-redline md:text-4xl">
+                        {project.title}
                       </span>
-                    ))}
-                  </div>
-                  <div className="flex gap-3">
-                    {project.github && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
-                        className="border-border hover:bg-secondary bg-transparent"
-                      >
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Github className="h-4 w-4 mr-2" />
-                          Code
-                        </a>
-                      </Button>
-                    )}
-                    {project.live && (
-                      <Button size="sm" asChild>
-                        <a
-                          href={project.live}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          Live Demo
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-        </div>
-
-        {/* Other Projects */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects
-            .filter((p) => !p.featured)
-            .map((project) => (
-              <div
-                key={project.title}
-                className="group p-6 bg-card rounded-xl border border-border hover:border-primary/50 transition-all duration-300"
-              >
-                {project.award && (
-                  <div className="flex items-center gap-2 mb-3 text-primary">
-                    <Trophy className="h-4 w-4" />
-                    <span className="text-xs font-medium">{project.award}</span>
-                  </div>
-                )}
-                <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                  {project.title}
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                  {project.description}
-                </p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.technologies.slice(0, 3).map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-2 py-1 bg-secondary text-secondary-foreground rounded text-xs"
-                    >
-                      {tech}
+                      <span className="mt-1 block text-pencil">{project.role}</span>
                     </span>
-                  ))}
-                </div>
-                <div className="flex gap-3">
-                  {project.github && (
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-primary transition-colors"
-                      aria-label={`View ${project.title} on GitHub`}
+                    <span className="order-4 col-span-2 text-lg md:order-none md:col-span-1">{project.result}</span>
+                    <motion.span
+                      aria-hidden="true"
+                      animate={{ rotate: isOpen ? 45 : 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                      className="order-2 grid h-9 w-9 place-items-center self-start rounded-full border border-rule transition-colors group-hover:border-redline group-hover:text-redline md:order-none md:self-center"
                     >
-                      <Github className="h-5 w-5" />
-                    </a>
-                  )}
-                  {project.live && (
-                    <a
-                      href={project.live}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-primary transition-colors"
-                      aria-label={`View ${project.title} live`}
+                      <Plus className="h-4 w-4" />
+                    </motion.span>
+                  </button>
+                </h3>
+
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      id={panelId}
+                      key="panel"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                      className="overflow-hidden"
                     >
-                      <ExternalLink className="h-5 w-5" />
-                    </a>
+                      <div className="grid gap-8 pb-10 md:grid-cols-[7rem_1fr_16rem] md:gap-x-6">
+                        <div className="hidden md:block" />
+                        <div>
+                          <ul className="max-w-[64ch] space-y-3">
+                            {project.points.map((point) => (
+                              <li key={point} className="relative pl-5 leading-relaxed">
+                                <span aria-hidden="true" className="absolute top-[0.7em] left-0 h-px w-2.5 bg-pencil" />
+                                {point}
+                              </li>
+                            ))}
+                          </ul>
+                          <ul aria-label="Technologies" className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-pencil">
+                            {project.stack.map((tech) => (
+                              <li key={tech}>{tech}</li>
+                            ))}
+                          </ul>
+                          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+                            {project.links.map((link) => (
+                              <a
+                                key={link.href}
+                                href={link.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group/link inline-flex items-center gap-1 font-medium underline decoration-redline underline-offset-4 hover:text-redline"
+                              >
+                                {link.label}
+                                <ArrowUpRight className="h-4 w-4 transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="max-w-56 self-start border border-rule bg-paper p-3 md:max-w-none">
+                          <ProjectDrawing project={project.key} />
+                        </div>
+                      </div>
+                    </motion.div>
                   )}
-                </div>
-              </div>
-            ))}
-        </div>
+                </AnimatePresence>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );

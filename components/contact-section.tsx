@@ -1,236 +1,87 @@
 "use client";
 
-import React from "react"
-
-import { useState } from "react";
-import { Github, Linkedin, Mail, MapPin, Phone, Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { Check, Copy, Download, Github, Linkedin } from "lucide-react";
+import { SectionHeading } from "@/components/section-heading";
+import { profile } from "@/lib/content";
 
 export function ContactSection() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setIsSubmitting(false);
-    setSubmitted(true);
-    setFormData({ name: "", email: "", subject: "", message: "" });
-
-    setTimeout(() => setSubmitted(false), 3000);
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(profile.email);
+      setCopied(true);
+    } catch {
+      window.location.href = `mailto:${profile.email}`;
+    }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const secondaryLinks = [
+    { label: "GitHub", href: profile.github, icon: Github, external: true },
+    { label: "LinkedIn", href: profile.linkedin, icon: Linkedin, external: true },
+    { label: "Download CV", href: profile.resume, icon: Download, external: false },
+  ];
 
   return (
-    <section id="contact" className="py-24 px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="text-primary text-sm font-medium tracking-wider uppercase">
-            Get In Touch
+    <section id="contact" aria-labelledby="contact-heading" className="py-24 md:py-32">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeading id="contact" title="Contact" intro={`${profile.availability}. Email is the fastest way to reach me.`} />
+
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+          <a
+            href={`mailto:${profile.email}`}
+            className="font-display text-[clamp(2rem,6.5vw,4.5rem)] font-semibold leading-none tracking-tight break-all underline decoration-redline decoration-2 underline-offset-[0.12em] transition-colors hover:text-redline sm:break-normal"
+          >
+            {profile.email}
+          </a>
+          <button
+            type="button"
+            onClick={copyEmail}
+            className="inline-flex w-fit items-center gap-2 rounded-[3px] border border-ink px-4 py-2 text-sm font-medium transition-colors hover:bg-ink hover:text-paper"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={copied ? "copied" : "copy"}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.15 }}
+                className="inline-flex items-center gap-2"
+              >
+                {copied ? <Check className="h-4 w-4 text-redline" /> : <Copy className="h-4 w-4" />}
+                {copied ? "Copied" : "Copy email"}
+              </motion.span>
+            </AnimatePresence>
+          </button>
+          <span role="status" className="sr-only">
+            {copied ? "Email address copied" : ""}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mt-2">
-            Let&apos;s Work Together
-          </h2>
-          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-            I&apos;m always open to discussing new opportunities, projects, or
-            partnerships. Feel free to reach out!
-          </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Contact Info */}
-          <div className="space-y-8">
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Mail className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">Email</h3>
-                  <a
-                    href="mailto:mofopeadegoke@gmail.com"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    mofopeadegoke@gmail.com
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Phone className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">Phone</h3>
-                  <a
-                    href="tel:+905488549642"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    +90 548 854 9642
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">Location</h3>
-                  <p className="text-muted-foreground">
-                    Lefke, Northern Cyprus (GMT+3)
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Social Links */}
-            <div className="pt-6 border-t border-border">
-              <h3 className="font-semibold text-foreground mb-4">
-                Connect with me
-              </h3>
-              <div className="flex gap-4">
-                <a
-                  href="https://github.com/mofopeadegoke"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all"
-                  aria-label="GitHub"
-                >
-                  <Github className="h-5 w-5" />
-                </a>
-                <a
-                  href="https://www.linkedin.com/in/mofopefoluwa-daniel-adegoke-abc/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin className="h-5 w-5" />
-                </a>
-                <a
-                  href="mailto:mofopeadegoke@gmail.com"
-                  className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all"
-                  aria-label="Email"
-                >
-                  <Mail className="h-5 w-5" />
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Contact Form */}
-          <div className="bg-card rounded-xl border border-border p-6 md:p-8">
-            {submitted ? (
-              <div className="h-full flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                    <Send className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
-                    Message Sent!
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Thank you for reaching out. I&apos;ll get back to you soon.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="Your name"
-                      required
-                      className="bg-background"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="your@email.com"
-                      required
-                      className="bg-background"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="subject">Subject</Label>
-                  <Input
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    placeholder="What's this about?"
-                    required
-                    className="bg-background"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    placeholder="Your message..."
-                    rows={5}
-                    required
-                    className="bg-background resize-none"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    "Sending..."
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4 mr-2" />
-                      Send Message
-                    </>
-                  )}
-                </Button>
-              </form>
-            )}
-          </div>
-        </div>
+        <ul className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-rule pt-6">
+          {secondaryLinks.map(({ label, href, icon: Icon, external }) => (
+            <li key={label}>
+              <a
+                href={href}
+                {...(external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : { download: true })}
+                className="inline-flex items-center gap-2 text-lg text-pencil transition-colors hover:text-redline"
+              >
+                <Icon className="h-5 w-5" />
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
