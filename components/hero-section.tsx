@@ -49,7 +49,7 @@ export function HeroSection() {
           </motion.p>
 
           <motion.div {...rise(1.2)} className="mt-9 flex flex-wrap items-center gap-3">
-            <LinkButton href={profile.resume} download>
+            <LinkButton href={profile.resume} download={profile.resumeFileName}>
               Download CV
             </LinkButton>
             <LinkButton href={`mailto:${profile.email}`} variant="outline">

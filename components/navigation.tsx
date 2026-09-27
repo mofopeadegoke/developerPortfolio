@@ -84,7 +84,7 @@ export function Navigation() {
             ))}
           </ul>
           <ThemeToggle />
-          <LinkButton href={profile.resume} download className="ml-2 px-4 py-2 text-sm">
+          <LinkButton href={profile.resume} download={profile.resumeFileName} className="ml-2 px-4 py-2 text-sm">
             Download CV
           </LinkButton>
         </div>
@@ -128,7 +128,7 @@ export function Navigation() {
                 </li>
               ))}
               <li className="pt-3 pb-2">
-                <LinkButton href={profile.resume} download className="w-full">
+                <LinkButton href={profile.resume} download={profile.resumeFileName} className="w-full">
                   Download CV
                 </LinkButton>
               </li>

@@ -28,4 +28,4 @@ Then open http://localhost:3000.
 | `lib/gear.ts` | Involute gear profile generator used by the hero, project drawing and icons. |
 | `app/globals.css` | Colour tokens for both themes, the construction grid and the slider styles. |
 | `components/` | One component per page section. |
-| `public/daniel_adegoke_resume.pdf` | The CV linked from the "Download CV" buttons. |
+| `public/daniel master resume.pdf` | The CV linked from the "Download CV" buttons. |

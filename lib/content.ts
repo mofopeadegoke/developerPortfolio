@@ -1,15 +1,16 @@
-// All site copy lives here, sourced from public/daniel_adegoke_resume.pdf.
+// All site copy lives here, sourced from "public/daniel master resume.pdf".
 
 export const profile = {
   name: "Daniel Adegoke",
   fullName: "Daniel Mofopefoluwa Adegoke",
   role: "Software Engineer",
   location: "Famagusta, Cyprus",
-  availability: "Open to relocation across Europe or remote",
+  availability: "Open to relocation (US, EU, UK, Canada, Singapore) or remote",
   email: "mofopeadegoke@gmail.com",
   github: "https://github.com/mofopeadegoke",
   linkedin: "https://www.linkedin.com/in/mofopefoluwa-daniel-adegoke-abc/",
-  resume: "/daniel_adegoke_resume.pdf",
+  resume: "/daniel%20master%20resume.pdf",
+  resumeFileName: "Daniel_Adegoke_Resume.pdf",
   revised: "Sep 2026",
 };
 
@@ -55,9 +56,10 @@ export const experience: Experience[] = [
     points: [
       "Built and maintained REST API endpoints in Python and PHP powering an AI-driven automation system used across 2 internal products.",
       "Designed secure RESTful APIs with JWT authentication for reliable data exchange between connected services.",
+      "Configured AI agent workflows on Model Context Protocol (MCP) servers to route AI support requests.",
       "Diagnosed and resolved 10+ production issues in a live automation pipeline, tracing each symptom to its root cause.",
     ],
-    stack: ["Python", "PHP", "REST", "JWT"],
+    stack: ["Python", "PHP", "REST", "JWT", "MCP"],
   },
   {
     role: "Software Developer Intern",
@@ -71,6 +73,32 @@ export const experience: Experience[] = [
       "Built and maintained 20+ reusable, responsive, mobile-first React components for the company's core product, work that led directly to being invited back as a full-time hire.",
     ],
     stack: ["React", "TypeScript", "C#"],
+  },
+  {
+    role: "Frontend Developer",
+    company: "Mensa Philosophical Circle",
+    location: "Remote",
+    start: "Jun 2023",
+    end: "Dec 2023",
+    summary: "Responsive, accessible web interfaces.",
+    points: [
+      "Developed and maintained responsive web interfaces, turning design mockups into functional, accessible frontend code with modern JavaScript frameworks.",
+      "Worked with the organisation's stakeholders to improve the user experience and keep the site working across browsers.",
+    ],
+    stack: ["JavaScript", "HTML", "CSS", "Accessibility"],
+  },
+  {
+    role: "Frontend Developer",
+    company: "Learning on the go",
+    location: "Nigeria",
+    start: "Aug 2022",
+    end: "Nov 2022",
+    summary: "Mobile-first interfaces for an education platform.",
+    points: [
+      "Built responsive, mobile-first educational web interfaces to make learning material more accessible.",
+      "Focused on client-side performance and clean HTML, CSS and JavaScript for a smooth user experience.",
+    ],
+    stack: ["HTML", "CSS", "JavaScript"],
   },
 ];
 
@@ -217,7 +245,7 @@ export const skillGroups: SkillGroup[] = [
 export const about = {
   paragraphs: [
     "I work across the whole stack but I'm happiest where interfaces meet hard engineering: a component library other developers can trust, or an undocumented C++ engine I had to learn by reading its source.",
-    "I graduated in June 2026 with a B.Sc. in Software Engineering and have been shipping production software since my internships in 2025.",
+    "I graduated in June 2026 with a B.Sc. in Software Engineering and have been shipping software since 2022, when I launched Inscribe.",
   ],
   education: {
     degree: "B.Sc. Software Engineering",
@@ -241,9 +269,10 @@ export const achievements: Achievement[] = [
     year: "2023",
     href: "https://github.com/mofopeadegoke/TechSpace-Project-Organik",
   },
-  { result: "Top 0.1%", event: "Teknofest, Robotics" },
-  { result: "Top 0.5%", event: "Teknofest, Tourism" },
-  { result: "Top 10%", event: "MARK AI marketing agent (Python)" },
+  { result: "Top 0.1%", event: "Teknofest, AI in Aviation", year: "2026" },
+  { result: "Top 0.1%", event: "Teknofest, Robotics", year: "2025" },
+  { result: "Top 0.5%", event: "Teknofest, Tourism", year: "2025" },
+  { result: "Top 10%", event: "MARK AI marketing agent (Python)", year: "2025" },
   { result: "Finalist", event: "Construct AI", year: "2024" },
   { result: "Finalist", event: "EMUSoft", year: "2025" },
 ];

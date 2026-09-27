@@ -73,7 +73,7 @@ export function ContactSection() {
                 href={href}
                 {...(external
                   ? { target: "_blank", rel: "noopener noreferrer" }
-                  : { download: true })}
+                  : { download: profile.resumeFileName })}
                 className="inline-flex items-center gap-2 text-lg text-pencil transition-colors hover:text-redline"
               >
                 <Icon className="h-5 w-5" />
