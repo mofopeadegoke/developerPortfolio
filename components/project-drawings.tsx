@@ -26,6 +26,15 @@ function Stroke({ d, delay = 0, accent = false }: { d: string; delay?: number; a
 }
 
 const drawings: Record<ProjectKey, React.ReactNode> = {
+  // A saved page with its summary lines, a bookmark ribbon and tags.
+  "smart-bookmarks": (
+    <>
+      <Stroke d="M30 14 h84 l16 16 v76 h-100 z M114 14 v16 h16" />
+      <Stroke d="M42 44 h60 M42 54 h72 M42 64 h48" delay={0.3} />
+      <Stroke d="M98 14 v26 l7 -6 7 6 v-26" accent delay={0.5} />
+      <Stroke d="M42 80 h24 v10 h-24 z M72 80 h30 v10 h-30 z M108 80 h12 v10 h-12 z" accent delay={0.7} />
+    </>
+  ),
   // A hardware module feeding a control panel that lays itself out.
   omniplexus: (
     <>

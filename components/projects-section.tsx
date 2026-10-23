@@ -25,7 +25,7 @@ export function ProjectsSection() {
       className="border-t border-rule bg-paper-raised py-24 md:py-32"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeading id="projects" title="Projects" intro="Things I built outside the day job, from robotics software to a browser extension people rely on." />
+        <SectionHeading id="projects" title="Projects" intro="Things I built outside the day job, from an AI bookmarking app and robotics software to a browser extension people rely on." />
 
         <ul className="border-t border-ink">
           {projects.map((project) => {
