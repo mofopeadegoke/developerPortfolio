@@ -17,7 +17,7 @@ export const profile = {
 export const hero = {
   lead: "I owned the frontend architecture for four production apps, and I write C++ geometry from first principles.",
   detail:
-    "React and TypeScript at work, Python for Django apps and AI agents, C++ when the problem goes below the UI.",
+    "React and TypeScript at work, Next.js, PostgreSQL and the Claude API for full-stack apps, C++ when the problem goes below the UI.",
 };
 
 export type Experience = {
@@ -103,7 +103,7 @@ export const experience: Experience[] = [
   },
 ];
 
-export type ProjectKey = "omniplexus" | "inscribe" | "gear" | "wormhole";
+export type ProjectKey = "smart-bookmarks" | "omniplexus" | "inscribe" | "gear" | "wormhole";
 
 export type Project = {
   key: ProjectKey;
@@ -117,6 +117,24 @@ export type Project = {
 };
 
 export const projects: Project[] = [
+  {
+    key: "smart-bookmarks",
+    title: "Smart Bookmarks",
+    role: "Full-stack AI web app, sole developer",
+    years: "2026",
+    result: "Paste a link, and Claude summarises and tags it for you",
+    points: [
+      "Built and shipped a full-stack Next.js app where Claude reads each saved link and writes a two-sentence summary and tags, reusing the tags you already have. Saves return instantly while the analysis runs in the background.",
+      "Secured server-side fetching of user-submitted URLs against SSRF: every redirect is checked for non-public IP addresses, with a timeout, a 2 MB size cap and HTML-only responses.",
+      "Treated AI output as untrusted, requesting structured JSON and validating it with Zod; every query is scoped to the user signed in with GitHub OAuth.",
+      "Accent-insensitive search in any language with PostgreSQL full-text search and a trigram index for Chinese and Japanese, covered by 35+ Vitest and Playwright tests against a real database.",
+    ],
+    stack: ["Next.js", "TypeScript", "PostgreSQL", "Drizzle ORM", "Claude API", "Zod", "Vitest", "Playwright"],
+    links: [
+      { label: "Live demo", href: "https://smart-bookmarks-livid.vercel.app/" },
+      { label: "Source on GitHub", href: "https://github.com/mofopeadegoke/smart-bookmarks" },
+    ],
+  },
   {
     key: "omniplexus",
     title: "Omniplexus",
@@ -190,12 +208,12 @@ export const skillGroups: SkillGroup[] = [
   {
     name: "Languages",
     skills: [
-      { name: "TypeScript", usedIn: "Ozbul, Inscribe" },
+      { name: "TypeScript", usedIn: "Ozbul, Smart Bookmarks" },
       { name: "JavaScript (ES6+)", usedIn: "Wormhole" },
       { name: "Python", usedIn: "Technolink, AI agents" },
       { name: "C++", usedIn: "Omniplexus, Gear Library" },
       { name: "C#", usedIn: "Ozbul stock app" },
-      { name: "SQL" },
+      { name: "SQL", usedIn: "Smart Bookmarks" },
       { name: "PHP", usedIn: "Technolink" },
       { name: "Java" },
     ],
@@ -204,6 +222,7 @@ export const skillGroups: SkillGroup[] = [
     name: "Frontend",
     skills: [
       { name: "React", usedIn: "Ozbul, Inscribe" },
+      { name: "Next.js (App Router)", usedIn: "Smart Bookmarks, this site" },
       { name: "React Native", usedIn: "Ozbul mobile apps" },
       { name: "TanStack Query", usedIn: "Ozbul" },
       { name: "Component libraries and design systems", usedIn: "Ozbul, 25+ components" },
@@ -214,21 +233,14 @@ export const skillGroups: SkillGroup[] = [
     ],
   },
   {
-    name: "Testing and quality",
-    skills: [
-      { name: "Vitest", usedIn: "Inscribe" },
-      { name: "Jest", usedIn: "Ozbul, +30% coverage" },
-      { name: "React Testing Library", usedIn: "Ozbul, Inscribe" },
-      { name: "Web performance optimisation", usedIn: "Ozbul" },
-      { name: "Accessibility (WCAG)", usedIn: "Ozbul, Mensa" },
-    ],
-  },
-  {
-    name: "Backend and APIs",
+    name: "Backend and data",
     skills: [
       { name: "Node.js" },
       { name: "Django" },
       { name: "REST API design", usedIn: "Technolink" },
+      { name: "PostgreSQL, full-text search", usedIn: "Smart Bookmarks" },
+      { name: "Drizzle ORM", usedIn: "Smart Bookmarks" },
+      { name: "OAuth", usedIn: "Smart Bookmarks" },
       { name: "JWT authentication", usedIn: "Technolink" },
       { name: "Object-oriented design" },
     ],
@@ -236,6 +248,7 @@ export const skillGroups: SkillGroup[] = [
   {
     name: "AI and systems",
     skills: [
+      { name: "Claude API, structured outputs", usedIn: "Smart Bookmarks" },
       { name: "AI agent development in Python", usedIn: "MARK AI" },
       { name: "Model Context Protocol (MCP)", usedIn: "Technolink" },
       { name: "AI-assisted development workflows" },
@@ -246,10 +259,24 @@ export const skillGroups: SkillGroup[] = [
     ],
   },
   {
+    name: "Testing and quality",
+    skills: [
+      { name: "Vitest", usedIn: "Smart Bookmarks, Inscribe" },
+      { name: "Jest", usedIn: "Ozbul, +30% coverage" },
+      { name: "Playwright", usedIn: "Smart Bookmarks" },
+      { name: "React Testing Library", usedIn: "Ozbul, Inscribe" },
+      { name: "Web performance optimisation", usedIn: "Ozbul" },
+      { name: "Web security (SSRF)", usedIn: "Smart Bookmarks" },
+      { name: "Accessibility (WCAG)", usedIn: "Ozbul, Mensa" },
+    ],
+  },
+  {
     name: "Tooling",
     skills: [
       { name: "Git and GitHub" },
+      { name: "Vercel", usedIn: "Smart Bookmarks, this site" },
       { name: "Vite, Webpack" },
+      { name: "pnpm" },
       { name: "Linux command line" },
       { name: "Agile / Scrum", usedIn: "Ozbul" },
     ],
@@ -260,6 +287,7 @@ export const about = {
   paragraphs: [
     "I work across the whole stack but I'm happiest where interfaces meet hard engineering: a component library other developers can trust, or an undocumented C++ engine I had to learn by reading its source.",
     "I graduated in June 2026 with a B.Sc. in Software Engineering and have been shipping software since 2022, when I launched Inscribe.",
+    "Lately I've moved into full-stack and AI work: Smart Bookmarks runs on Next.js and PostgreSQL and uses Claude to summarise and tag what you save.",
   ],
   education: {
     degree: "B.Sc. Software Engineering",

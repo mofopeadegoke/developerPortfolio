@@ -17,7 +17,7 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 const description =
-  "Software Engineer in Famagusta, Cyprus. Frontend architecture in React, React Native and TypeScript, APIs in Python, and C++ systems work. Open to relocation across Europe or remote.";
+  "Software Engineer in Famagusta, Cyprus. Frontend architecture in React, React Native and TypeScript, full-stack apps with Next.js, PostgreSQL and the Claude API, and C++ systems work. Open to relocation across Europe or remote.";
 
 export const metadata: Metadata = {
   title: "Daniel Adegoke | Software Engineer",
