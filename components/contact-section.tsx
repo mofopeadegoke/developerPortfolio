@@ -30,15 +30,15 @@ export function ContactSection() {
   ];
 
   return (
-    <Room stop="contact" id="contact" aria-labelledby="contact-heading" mark="Room 6 of 6, Exit">
+    <Room stop="contact" id="contact" aria-labelledby="contact-heading">
       <h2 id="contact-heading" className="font-display text-4xl font-extrabold tracking-[-0.02em] [font-stretch:115%]">
         Contact
       </h2>
       <p className="mt-3 text-quiet">{profile.availability}. Email is the fastest way to reach me.</p>
-      <a href={`mailto:${profile.email}`} className="mt-6 block font-display text-[clamp(1.25rem,2.4vw,1.625rem)] font-bold break-all underline decoration-ultramarine decoration-2 transition-colors hover:text-ultramarine">
+      <a href={`mailto:${profile.email}`} className="mt-6 block font-display text-[clamp(1.25rem,2.4vw,1.625rem)] font-bold break-all underline decoration-copper decoration-2 transition-colors hover:text-amber">
         {profile.email}
       </a>
-      <button type="button" onClick={copyEmail} className="mt-4 inline-flex items-center gap-2 border border-ink px-4 py-2.5 text-sm font-medium transition-colors hover:bg-ink hover:text-label">
+      <button type="button" onClick={copyEmail} className="mt-4 inline-flex items-center gap-2 border border-copper px-4 py-2.5 text-sm font-medium transition-colors hover:bg-copper hover:text-ground">
         {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
         {copied ? "Copied" : "Copy email"}
       </button>
@@ -51,7 +51,7 @@ export function ContactSection() {
             <a
               href={href}
               {...(external ? { target: "_blank", rel: "noopener noreferrer" } : { download: profile.resumeFileName })}
-              className="inline-flex items-center gap-2 text-quiet transition-colors hover:text-ultramarine"
+              className="inline-flex items-center gap-2 text-quiet transition-colors hover:text-amber"
             >
               <Icon className="h-5 w-5" />
               {label}

@@ -2,7 +2,7 @@
 
 ## liquid-logo
 
-The liquid-metal flow in `components/gallery/liquid-metal.ts` is adapted from
+The liquid-metal flow in `components/gallery/form-material.ts` is adapted from
 https://github.com/collidingScopes/liquid-logo.
 
 ```

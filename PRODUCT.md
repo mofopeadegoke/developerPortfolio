@@ -28,7 +28,9 @@ A recent software engineering graduate who owned frontend architecture for produ
 ## Brand Commitments
 
 - The involute gear is no longer the site's identity. A gear appears only as the Gear Library project's own exhibit.
-- The visual materials come from react-three-fiber, shadergradient and liquid-logo. The look of liquid-glass-js is recreated inside the 3D scene rather than installed.
+- The theme is one colour family, Molten Copper, on near-black. Several bright, contrasting colours were rejected by the user.
+- 3D must be the main event and respond to the visitor, not decoration beside the content.
+- The visual materials come from react-three-fiber, shadergradient and liquid-logo. liquid-glass-js is not used in this direction.
 
 ## Evidence on Hand
 

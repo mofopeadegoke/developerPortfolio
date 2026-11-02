@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { caseLayout, detectTier, stops, type Tier } from "@/lib/gallery";
+import { detectTier, type Tier } from "@/lib/gallery";
 
 // The page's words are all server-rendered; the 3D stage only ever sits behind
 // them, so it loads after the content and nobody waits for it.
@@ -27,21 +27,6 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
     setView(initial);
   }, []);
 
-  // Still images have no scene to measure, so the hairlines are placed from the
-  // same layout the images were captured with.
-  useEffect(() => {
-    if (tier !== "still") return;
-    const place = () => {
-      for (const stop of stops) {
-        const { tie } = caseLayout(stop, window.innerWidth, window.innerHeight, false);
-        document.querySelector<HTMLElement>(`[data-stop="${stop.id}"]`)?.style.setProperty("--tie", `${tie}px`);
-      }
-    };
-    place();
-    window.addEventListener("resize", place);
-    return () => window.removeEventListener("resize", place);
-  }, [tier]);
-
   const toggleView = useCallback(() => {
     setView((current) => {
       const next = current === "list" ? "gallery" : "list";
@@ -60,13 +45,18 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
     setTier("still");
   }, []);
 
+  const markReady = useCallback(() => {
+    document.documentElement.dataset.stage = "ready";
+    setReady(true);
+  }, []);
+
   const value = useMemo(() => ({ view, toggleView }), [view, toggleView]);
   const showCanvas = view === "gallery" && tier !== null && tier !== "still";
 
   return (
     <GalleryContext.Provider value={value}>
       <div aria-hidden="true" className="gallery-stage" data-ready={ready || undefined}>
-        {showCanvas && <GalleryCanvas tier={tier} onFallback={fallBack} onReady={() => setReady(true)} />}
+        {showCanvas && <GalleryCanvas tier={tier} onFallback={fallBack} onReady={markReady} />}
       </div>
       {children}
     </GalleryContext.Provider>

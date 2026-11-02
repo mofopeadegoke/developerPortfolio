@@ -20,7 +20,7 @@ export function Navigation() {
   const viewLabel = view === "list" ? "Gallery view" : "List view";
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-rule bg-label">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-rule bg-ground">
       <nav aria-label="Main" className="flex h-14 items-center justify-between px-[var(--gutter)]">
         <a href="#top" className="font-display text-lg font-extrabold tracking-[-0.01em] [font-stretch:115%]">
           {profile.name}
@@ -30,13 +30,13 @@ export function Navigation() {
           <ul className="flex items-center gap-5">
             {links.map((link) => (
               <li key={link.id}>
-                <a href={`#${link.id}`} className="py-2 text-[0.95rem] text-quiet transition-colors hover:text-ink">
+                <a href={`#${link.id}`} className="py-2 text-[0.95rem] text-quiet transition-colors hover:text-text">
                   {link.label}
                 </a>
               </li>
             ))}
           </ul>
-          <button type="button" onClick={toggleView} className="py-2 text-[0.95rem] font-medium underline decoration-ultramarine underline-offset-4 transition-colors hover:text-ultramarine">
+          <button type="button" onClick={toggleView} className="py-2 text-[0.95rem] font-medium underline decoration-copper underline-offset-4 transition-colors hover:text-amber">
             {viewLabel}
           </button>
           <LinkButton href={profile.resume} download={profile.resumeFileName} className="px-4 py-2 text-sm">
@@ -45,7 +45,7 @@ export function Navigation() {
         </div>
 
         <div className="flex items-center gap-3 lg:hidden">
-          <button type="button" onClick={toggleView} className="py-2 text-sm font-medium underline decoration-ultramarine underline-offset-4">
+          <button type="button" onClick={toggleView} className="py-2 text-sm font-medium underline decoration-copper underline-offset-4">
             {viewLabel}
           </button>
           <button

@@ -3,7 +3,7 @@ import { skillGroups } from "@/lib/content";
 
 export function SkillsSection() {
   return (
-    <Room stop="skills" id="skills" aria-labelledby="skills-heading" mark="Room 4 of 6. Each column is as tall as its skill group." size="wide">
+    <Room stop="skills" id="skills" aria-labelledby="skills-heading" size="wide">
       <h2 id="skills-heading" className="font-display text-4xl font-extrabold tracking-[-0.02em] [font-stretch:115%]">
         Skills
       </h2>

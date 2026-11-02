@@ -5,8 +5,8 @@ import { hero, profile } from "@/lib/content";
 
 export function EntranceSection() {
   return (
-    <Room stop="top" id="top" aria-label="Introduction" mark="Room 1 of 6, Entrance" className="room-entrance">
-      <h1 className="font-display text-[clamp(2.25rem,4vw,3.25rem)] font-extrabold leading-[1] tracking-[-0.02em] [font-stretch:115%]">
+    <Room stop="top" id="top" aria-label="Introduction" className="room-entrance">
+      <h1 className="hero-name font-display text-[clamp(2.25rem,4vw,3.25rem)] font-extrabold leading-[1] tracking-[-0.02em] [font-stretch:115%]">
         {profile.name}
       </h1>
       <p className="mt-2 text-xl text-quiet">{profile.role}</p>
@@ -19,10 +19,10 @@ export function EntranceSection() {
         <LinkButton href={`mailto:${profile.email}`} variant="outline">
           Email me
         </LinkButton>
-        <a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="grid h-11 w-11 place-items-center text-quiet transition-colors hover:text-ultramarine">
+        <a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="grid h-11 w-11 place-items-center text-quiet transition-colors hover:text-amber">
           <Github className="h-5 w-5" />
         </a>
-        <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="grid h-11 w-11 place-items-center text-quiet transition-colors hover:text-ultramarine">
+        <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="grid h-11 w-11 place-items-center text-quiet transition-colors hover:text-amber">
           <Linkedin className="h-5 w-5" />
         </a>
       </div>

@@ -3,7 +3,7 @@ import { experience } from "@/lib/content";
 
 export function ExperienceSection() {
   return (
-    <Room stop="experience" id="experience" aria-labelledby="experience-heading" mark="Room 2 of 6. Each slab is as long as the role." size="wide">
+    <Room stop="experience" id="experience" aria-labelledby="experience-heading" size="wide">
       <h2 id="experience-heading" className="font-display text-4xl font-extrabold tracking-[-0.02em] [font-stretch:115%]">
         Experience
       </h2>

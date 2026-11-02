@@ -9,8 +9,8 @@ export function LinkButton({ variant = "solid", className, ...props }: LinkButto
       className={cn(
         "inline-flex items-center justify-center gap-2 border px-5 py-3 font-medium transition-colors duration-200",
         variant === "solid"
-          ? "border-ink bg-ink text-label hover:border-ultramarine hover:bg-ultramarine"
-          : "border-ink bg-transparent text-ink hover:bg-ink hover:text-label",
+          ? "border-copper bg-copper text-ground hover:border-amber hover:bg-amber"
+          : "border-copper bg-transparent text-text hover:bg-copper hover:text-ground",
         className,
       )}
       {...props}

@@ -11,7 +11,7 @@ import { Footer } from "@/components/footer";
 export default function Portfolio() {
   return (
     <GalleryProvider>
-      <a href="#experience" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-label focus:px-4 focus:py-2">
+      <a href="#experience" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-ground focus:px-4 focus:py-2">
         Skip to content
       </a>
       <Navigation />

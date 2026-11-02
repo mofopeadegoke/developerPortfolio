@@ -6,7 +6,7 @@ export function AboutSection() {
   const { education } = about;
 
   return (
-    <Room stop="about" id="about" aria-labelledby="about-heading" mark="Room 5 of 6. The sculpture is the degree's CGPA." size="wide">
+    <Room stop="about" id="about" aria-labelledby="about-heading" size="wide">
       <h2 id="about-heading" className="font-display text-4xl font-extrabold tracking-[-0.02em] [font-stretch:115%]">
         About
       </h2>
@@ -37,7 +37,7 @@ export function AboutSection() {
               <td className="w-24 py-2.5 pr-3 font-semibold whitespace-nowrap">{item.result}</td>
               <td className="py-2.5 pr-3">
                 {item.href ? (
-                  <a href={item.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 underline decoration-ultramarine hover:text-ultramarine">
+                  <a href={item.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 underline decoration-copper hover:text-amber">
                     {item.event}
                     <ArrowUpRight className="h-4 w-4" aria-label="(opens project on GitHub)" />
                   </a>

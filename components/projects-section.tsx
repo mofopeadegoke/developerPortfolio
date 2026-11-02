@@ -6,7 +6,7 @@ export function ProjectsSection() {
   return (
     <div id="projects">
       {projects.map((project, index) => (
-        <Room key={project.key} stop={project.key} aria-labelledby={`project-${project.key}`} mark={`Room 3 of 6, case ${index + 1} of ${projects.length}`}>
+        <Room key={project.key} stop={project.key} aria-labelledby={`project-${project.key}`}>
           {index === 0 && (
             <div className="mb-8 border-b border-rule pb-6">
               <h2 className="font-display text-4xl font-extrabold tracking-[-0.02em] [font-stretch:115%]">Projects</h2>
@@ -38,7 +38,7 @@ export function ProjectsSection() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-medium underline decoration-ultramarine transition-colors hover:text-ultramarine"
+                className="inline-flex items-center gap-1 font-medium underline decoration-copper transition-colors hover:text-amber"
               >
                 {link.label}
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
