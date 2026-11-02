@@ -23,7 +23,20 @@ const DOOR_HEIGHT = 5.4;
 /** How bright a room is once the camera has left it: a glow, not a competitor. */
 const AWAY_LIGHT = 0.5;
 
-const roomLight = (distance: number) => THREE.MathUtils.lerp(1, AWAY_LIGHT, THREE.MathUtils.smoothstep(distance, 0.45, 1.1));
+const roomLight = (distance: number) =>
+  THREE.MathUtils.lerp(1, AWAY_LIGHT, THREE.MathUtils.smoothstep(distance, 0.45, 1.1)) * (distance > 1.1 ? Math.max(0.6, 1 - (distance - 1.1) * 0.22) : 1);
+
+/** One wall with the doorway cut out, so the wash runs unbroken around it. */
+function createDoorWall() {
+  const halfWidth = ROOM_WIDTH / 2;
+  const wall = new THREE.Shape();
+  wall.moveTo(-halfWidth, 0).lineTo(-DOOR_WIDTH / 2, 0).lineTo(-DOOR_WIDTH / 2, DOOR_HEIGHT).lineTo(DOOR_WIDTH / 2, DOOR_HEIGHT);
+  wall.lineTo(DOOR_WIDTH / 2, 0).lineTo(halfWidth, 0).lineTo(halfWidth, ROOM_HEIGHT).lineTo(-halfWidth, ROOM_HEIGHT).closePath();
+  const geometry = new THREE.ShapeGeometry(wall);
+  const uv = geometry.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) / ROOM_WIDTH + 0.5, uv.getY(i) / ROOM_HEIGHT);
+  return geometry;
+}
 
 /** ShaderGradient renders off-screen, and its light washes every wall. */
 function useWallLight(enabled: boolean) {
@@ -94,7 +107,7 @@ function Walls({ wallLight, position }: { wallLight: THREE.Texture | null; posit
   });
 
   const doors = useMemo(() => stops.flatMap((stop, i) => (stops[i + 1] && stops[i + 1].room !== stop.room ? [i] : [])), []);
-  const pier = (ROOM_WIDTH - DOOR_WIDTH) / 2;
+  const doorWall = useMemo(createDoorWall, []);
 
   return (
     <group>
@@ -117,16 +130,7 @@ function Walls({ wallLight, position }: { wallLight: THREE.Texture | null; posit
       ))}
 
       {doors.map((i) => (
-        <group key={i} position={[0, 0, stopZ(i) - STOP_SPACING / 2]}>
-          {[-1, 1].map((side) => (
-            <mesh key={side} material={walls[i]} position={[side * (DOOR_WIDTH / 2 + pier / 2), ROOM_HEIGHT / 2, 0]}>
-              <boxGeometry args={[pier, ROOM_HEIGHT, 0.4]} />
-            </mesh>
-          ))}
-          <mesh material={walls[i]} position={[0, (ROOM_HEIGHT + DOOR_HEIGHT) / 2, 0]}>
-            <boxGeometry args={[DOOR_WIDTH, ROOM_HEIGHT - DOOR_HEIGHT, 0.4]} />
-          </mesh>
-        </group>
+        <mesh key={i} geometry={doorWall} material={walls[i]} position={[0, 0, stopZ(i) - STOP_SPACING / 2]} />
       ))}
 
       {/* The far wall, so the walk ends in a room. */}
@@ -159,7 +163,7 @@ function VitrineGlass({ size, full, sheen }: { size: [number, number, number]; f
       <mesh>
         <boxGeometry args={size} />
         {full ? (
-          <MeshTransmissionMaterial transmissionSampler thickness={0.35} roughness={0} ior={1.28} chromaticAberration={0.035} anisotropy={0.2} distortion={0.16} distortionScale={0.4} temporalDistortion={0.06} attenuationColor="#ffffff" color="#ffffff" />
+          <MeshTransmissionMaterial transmissionSampler thickness={0.1} roughness={0} ior={1.2} chromaticAberration={0.035} anisotropy={0.2} distortion={0.1} distortionScale={0.4} temporalDistortion={0.06} attenuationColor="#ffffff" color="#ffffff" />
         ) : (
           <meshPhysicalMaterial transparent opacity={0.1} roughness={0.05} metalness={0} color="#ffffff" depthWrite={false} />
         )}
@@ -180,10 +184,11 @@ type CaseProps = {
   position: { current: number };
   material: THREE.Material;
   sheen: THREE.Texture;
+  plinthMaterial: THREE.Material;
   caseX: { current: number[] };
 };
 
-function Case({ index, full, phone, position, material, sheen, caseX }: CaseProps) {
+function Case({ index, full, phone, position, material, sheen, plinthMaterial, caseX }: CaseProps) {
   const stop = stops[index];
   const width = useThree((state) => state.size.width);
   const height = useThree((state) => state.size.height);
@@ -209,12 +214,12 @@ function Case({ index, full, phone, position, material, sheen, caseX }: CaseProp
   const baseHeight = phone ? 1.6 : 0.95;
   const plinth: [number, number] = [(size[0] + 0.3) * fit, (size[2] + 0.3) * fit];
   const isName = stop.id === "top";
+  const rodHeight = isName ? 0.62 : size[1] / 2 - 0.4;
 
   return (
     <group position={[x, 0, stopZ(index)]} visible={state.near}>
-      <mesh position={[0, baseHeight / 2, 0]}>
+      <mesh material={plinthMaterial} position={[0, baseHeight / 2, 0]}>
         <boxGeometry args={[plinth[0], baseHeight, plinth[1]]} />
-        <meshStandardMaterial color="#14151c" roughness={0.3} metalness={0.2} />
       </mesh>
       {full && state.active ? (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, baseHeight + 0.004, 0]}>
@@ -225,8 +230,8 @@ function Case({ index, full, phone, position, material, sheen, caseX }: CaseProp
       <group position={[0, baseHeight + (size[1] / 2) * fit, 0]} scale={fit}>
         {/* Mounting rods, so each sculpture stands rather than floats. */}
         {(isName ? [-1.7, 1.7] : [0]).map((rod) => (
-          <mesh key={rod} material={material} position={[rod, -size[1] / 4 - 0.2, 0]}>
-            <cylinderGeometry args={[0.03, 0.03, size[1] / 2 - 0.4, 12]} />
+          <mesh key={rod} material={material} position={[rod, -size[1] / 2 + rodHeight / 2, 0]}>
+            <cylinderGeometry args={[0.03, 0.03, rodHeight, 12]} />
           </mesh>
         ))}
         {state.near && (
@@ -248,6 +253,7 @@ function Scene({ tier, onFallback }: { tier: Tier; onFallback: () => void }) {
   const { camera, size, scene } = useThree();
   const material = useMemo(createLiquidMetal, []);
   const sheen = useMemo(createSheen, []);
+  const plinthMaterial = useMemo(() => new THREE.MeshStandardMaterial({ color: "#23252f", roughness: 0.24, metalness: 0.7, envMapIntensity: 0.5 }), []);
   // Under load the scene sheds effects one at a time, heaviest first, and only
   // drops to still images once there is nothing left to shed.
   const [shed, setShed] = useState(0);
@@ -261,7 +267,7 @@ function Scene({ tier, onFallback }: { tier: Tier; onFallback: () => void }) {
   const target = useMemo(() => new THREE.Object3D(), []);
   const glass = full && shed < 1;
   const white = useMemo(() => new THREE.Color("#ffffff"), []);
-  const tints = useMemo(() => stops.map((stop) => new THREE.Color("#ffffff").lerp(new THREE.Color(roomColors[stop.room]), 0.16)), []);
+  const tints = useMemo(() => stops.map((stop) => new THREE.Color("#ffffff").lerp(new THREE.Color(roomColors[stop.room]), 0.36)), []);
 
   useEffect(() => {
     const measure = () => {
@@ -295,7 +301,9 @@ function Scene({ tier, onFallback }: { tier: Tier; onFallback: () => void }) {
     // the studio lighting belongs to the metal alone. Glass and walls stay clean.
     if (scene.environment && !material.envMap) {
       material.envMap = scene.environment;
+      plinthMaterial.envMap = scene.environment;
       material.needsUpdate = true;
+      plinthMaterial.needsUpdate = true;
       scene.environment = null;
     }
 
@@ -338,16 +346,16 @@ function Scene({ tier, onFallback }: { tier: Tier; onFallback: () => void }) {
       <primitive object={target} />
       <spotLight ref={light} target={target} intensity={70} angle={0.62} penumbra={0.9} distance={18} color="#ffffff" />
       <Environment resolution={256} frames={1}>
-        <color attach="background" args={["#171925"]} />
-        <Lightformer form="rect" intensity={6} color="#ffffff" position={[0, 3.2, 8]} scale={[16, 3.4, 1]} />
-        <Lightformer form="rect" intensity={7} color="#ffffff" position={[0, 7, 1]} scale={[16, 7, 1]} rotation={[Math.PI / 2, 0, 0]} />
-        <Lightformer form="rect" intensity={3} color="#ffffff" position={[-7, 1, 3]} scale={[6, 10, 1]} rotation={[0, Math.PI / 2, 0]} />
-        <Lightformer form="rect" intensity={4} color="#ffffff" position={[7, 2, 3]} scale={[5, 10, 1]} rotation={[0, -Math.PI / 2, 0]} />
-        <Lightformer form="rect" intensity={2} color="#ffffff" position={[0, -6, 3]} scale={[16, 6, 1]} rotation={[-Math.PI / 2, 0, 0]} />
+        <color attach="background" args={["#2a2d3b"]} />
+        <Lightformer form="rect" intensity={2.4} color="#ffffff" position={[0, 3.2, 8]} scale={[16, 3.4, 1]} />
+        <Lightformer form="rect" intensity={3.4} color="#ffffff" position={[0, 7, 1]} scale={[16, 7, 1]} rotation={[Math.PI / 2, 0, 0]} />
+        <Lightformer form="rect" intensity={1.8} color="#ffffff" position={[-7, 1, 3]} scale={[6, 10, 1]} rotation={[0, Math.PI / 2, 0]} />
+        <Lightformer form="rect" intensity={2.2} color="#ffffff" position={[7, 2, 3]} scale={[5, 10, 1]} rotation={[0, -Math.PI / 2, 0]} />
+        <Lightformer form="rect" intensity={1.2} color="#ffffff" position={[0, -6, 3]} scale={[16, 6, 1]} rotation={[-Math.PI / 2, 0, 0]} />
       </Environment>
       <Walls wallLight={texture} position={position} />
       {stops.map((stop, index) => (
-        <Case key={stop.id} index={index} full={full && glass} phone={phone} position={position} material={material} sheen={sheen} caseX={caseX} />
+        <Case key={stop.id} index={index} full={full && glass} phone={phone} position={position} material={material} sheen={sheen} plinthMaterial={plinthMaterial} caseX={caseX} />
       ))}
     </>
   );

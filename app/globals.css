@@ -173,28 +173,33 @@ html[data-tier="still"] .gallery-stage {
 }
 html[data-tier="still"] .room {
   background: var(--room-color);
-  padding-top: 6rem;
-}
-html[data-tier="still"] .room-entrance {
-  min-height: 100svh;
 }
 html[data-tier="still"] .room-still {
   display: block;
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+}
+html[data-tier="still"] .room-still::before {
+  content: "";
+  display: block;
   position: sticky;
   top: 0;
-  flex: none;
-  align-self: stretch;
   height: 100svh;
-  margin: -6rem calc(var(--gutter) * -1) -100svh;
-  margin-top: -6rem;
   background: var(--room-still) center / cover;
-}
-html[data-tier="still"] .room-still + .wall-label {
-  margin-top: 6rem;
 }
 @media (max-width: 767px) {
   html[data-tier="still"] .room-still {
-    background-position: 78% center;
+    inset: 3.5rem 0 auto;
+    height: calc(54svh - 3.5rem);
+  }
+  html[data-tier="still"] .room-entrance .room-still {
+    height: calc(42svh - 3.5rem);
+  }
+  html[data-tier="still"] .room-still::before {
+    position: static;
+    height: 100%;
+    background: var(--room-still-phone) center / cover;
   }
 }
 

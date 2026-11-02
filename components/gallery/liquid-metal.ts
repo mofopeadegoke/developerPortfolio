@@ -11,8 +11,8 @@ export function createLiquidMetal() {
   const material = new THREE.MeshStandardMaterial({
     color: "#f4f5f8",
     metalness: 1,
-    roughness: 0.11,
-    envMapIntensity: 1.25,
+    roughness: 0.14,
+    envMapIntensity: 1,
   });
 
   material.onBeforeCompile = (shader) => {

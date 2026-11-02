@@ -18,7 +18,7 @@ export function Room({ stop, mark, size, className, children, ...props }: RoomPr
       data-label={entry.label}
       data-size={size}
       className={cn("room", className)}
-      style={{ "--room-color": roomColors[entry.room], "--room-still": `url(/rooms/${stop}.jpg)` } as CSSProperties}
+      style={{ "--room-color": roomColors[entry.room], "--room-still": `url(/rooms/${stop}.jpg)`, "--room-still-phone": `url(/rooms/phone-${stop}.jpg)` } as CSSProperties}
       {...props}
     >
       <div aria-hidden="true" className="room-still" />

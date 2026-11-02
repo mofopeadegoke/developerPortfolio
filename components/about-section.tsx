@@ -34,7 +34,7 @@ export function AboutSection() {
         <tbody>
           {achievements.map((item) => (
             <tr key={`${item.result}-${item.event}`} className="border-b border-rule align-baseline">
-              <td className="w-24 py-2.5 pr-3 font-semibold whitespace-nowrap [font-variant-numeric:tabular-nums]">{item.result}</td>
+              <td className="w-24 py-2.5 pr-3 font-semibold whitespace-nowrap">{item.result}</td>
               <td className="py-2.5 pr-3">
                 {item.href ? (
                   <a href={item.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 underline decoration-ultramarine hover:text-ultramarine">

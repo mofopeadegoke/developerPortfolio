@@ -19,9 +19,9 @@ type SculptureProps = { material: THREE.Material; active: boolean };
 const bevel = { bevelEnabled: true, bevelSize: 0.035, bevelThickness: 0.05, bevelSegments: 4, curveSegments: 10 };
 const extrude = (depth: number) => ({ depth, ...bevel });
 
-function Word({ material, text, size, depth = 0.24 }: { material: THREE.Material; text: string; size: number; depth?: number }) {
+function Word({ material, text, size, depth = 0.24, spacing = 0.07 }: { material: THREE.Material; text: string; size: number; depth?: number; spacing?: number }) {
   return (
-    <Text3D font={FONT} size={size} height={depth} letterSpacing={0.07} material={material} {...bevel}>
+    <Text3D font={FONT} size={size} height={depth} letterSpacing={spacing} material={material} {...bevel}>
       {text}
     </Text3D>
   );
@@ -117,12 +117,15 @@ function UncookedSculpture({ material, active }: SculptureProps) {
 
 function BookmarkSculpture({ material, active }: SculptureProps) {
   const geometry = useMemo(() => {
-    const ribbon = new THREE.Shape();
-    ribbon.moveTo(-0.72, 1.5).lineTo(0.72, 1.5).lineTo(0.72, -1.5).lineTo(0, -0.82).lineTo(-0.72, -1.5).closePath();
-    const built = new THREE.ExtrudeGeometry(ribbon, { ...extrude(0.14), steps: 1 });
+    // A finely divided sheet, so the swallowtail and the bend stay smooth.
+    const built = new THREE.BoxGeometry(1.44, 3, 0.14, 32, 64, 1);
     const position = built.attributes.position;
     for (let i = 0; i < position.count; i++) {
-      position.setZ(i, position.getZ(i) + Math.sin(position.getY(i) * 1.5) * 0.3 + position.getX(i) ** 2 * 0.22);
+      const x = position.getX(i);
+      const bottom = -1.5 + (1 - Math.abs(x) / 0.72) * 0.68;
+      const y = bottom + ((1.5 - bottom) * (position.getY(i) + 1.5)) / 3;
+      position.setY(i, y);
+      position.setZ(i, position.getZ(i) + Math.sin(y * 1.5) * 0.3 + x * x * 0.22);
     }
     built.computeVertexNormals();
     return built;
@@ -179,7 +182,7 @@ function NibSculpture({ material, active }: SculptureProps) {
     eye.absarc(0, 0.28, 0.17, 0, Math.PI * 2, true);
     nib.holes.push(eye);
     const slit = new THREE.Path();
-    slit.moveTo(-0.022, -1.28).lineTo(0.022, -1.28).lineTo(0.022, 0.12).lineTo(-0.022, 0.12).closePath();
+    slit.moveTo(-0.05, -1.2).lineTo(0.05, -1.2).lineTo(0.05, 0.12).lineTo(-0.05, 0.12).closePath();
     nib.holes.push(slit);
     return new THREE.ExtrudeGeometry(nib, extrude(0.2));
   }, []);
@@ -255,7 +258,7 @@ function GradeSculpture({ material, active }: SculptureProps) {
   return (
     <Spin active={active} speed={0.36} swing={0.42}>
       <Center>
-        <Word material={material} text="3.81" size={1.15} depth={0.5} />
+        <Word material={material} text="3.81" size={1.05} depth={0.34} spacing={0.14} />
       </Center>
     </Spin>
   );
