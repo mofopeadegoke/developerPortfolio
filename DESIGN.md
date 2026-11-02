@@ -249,7 +249,7 @@ The words at each stop, set straight on the ground.
 ### The Form
 The signature component: one point cloud, drawn with `react-three-fiber`, that takes a shape for each of the 11 stops. The shapes are generated in code and sampled in advance into one float texture, and the flow that carries the points is adapted from `liquid-logo`.
 
-- **Points:** 90,000 on Full and 28,900 on Phone, each a soft round light 0.6 to 1.4 times the base size. The first sixth are drawn again at seven times the size and very low alpha (0.07, or 0.035 on Phone), which stands in for a bloom pass at a fraction of the cost.
+- **Points:** 90,000 on Full and 52,900 on Phone, each a soft round light 0.6 to 1.4 times the base size. The first sixth are drawn again at seven times the size and very low alpha (0.07, or 0.035 on Phone), which stands in for a bloom pass at a fraction of the cost.
 - **Shapes:** The name, stepped slabs for Experience, a page with a line cut out of it for Uncooked, a curling bookmark, a raised grid of modules for Omniplexus, a pen nib for Inscribe, a gear for the Gear Library, nested rings for Wormhole, a ring of columns for Skills, the figure 3.81 for About, and an @ for Contact.
 - **At rest:** The surface creeps very slightly like molten metal, and the whole form sways slowly: barely on the name (0.06 radians), more on the later shapes (0.3 radians).
 - **Hold and rebuild:** The form holds its shape while the visitor reads, then rebuilds over the last 0.9 of a viewport before the next stop, on a smoothstep with damping at rate 5.
@@ -263,14 +263,14 @@ The signature component: one point cloud, drawn with `react-three-fiber`, that t
 
 **The Real Shape Rule.** Every shape is generated from code and, where it shows a quantity, from real data. Experience slabs are as long as each role, Skills columns are as tall as each group, the gear is the same involute profile as the Gear Library, and 3.81 is the actual CGPA.
 
-**The Readable Words Rule.** The form never competes with reading. On desktop it dims to 20% at the midpoint of a rebuild, the only time it reaches the words. On phones the words scroll across it, so it steps back to 16% from just after a stop begins until just before the next.
+**The Readable Words Rule.** The form never competes with reading. On desktop it dims to 20% at the midpoint of a rebuild, the only time it reaches the words. On phones the words scroll across it, so it steps back to 16% from just after a stop begins until just before the next. On phones the words arrive on a solid Ground sheet with faded edges, so the form above them stays at full strength instead of dimming.
 
 The name, 3.81 and the @ use Archivo from the subset at `public/fonts/gallery-display.json`, which holds only the glyphs in use, so new letters in the form need a new subset.
 
 ### Rendering Tiers
 How much of the form a device runs is decided at load, and every tier carries the same words.
 - **Full:** Desktop. 90,000 points, the backdrop, pixel ratio up to 1.5.
-- **Phone:** Coarse pointers and viewports below 768px. 28,900 points, no backdrop, the stacked name, and the form in the upper screen.
+- **Phone:** Coarse pointers and viewports below 768px. 52,900 points, no backdrop, the stacked name, and the form in the upper screen.
 - **Still:** No WebGL2, reduced motion, or a coarse pointer on a weak device (3GB memory or less, or 4 cores or fewer). The stage is removed, and each stop shows a captured image of its shape on the dark ground. There are 22 files in `public/rooms/`: one desktop and one phone capture per stop. On desktop the image stays sticky behind the words, and on phones it is a band under the navigation bar.
 
 **The Shed Heaviest First Rule.** When frame rate declines, the form gives things up one at a time: pixel ratio drops to 1, then the backdrop goes, and only then does the site fall back to Still. A visitor never waits on an effect.
@@ -288,7 +288,7 @@ One plain document on Ground, switched from the navigation bar and remembered be
 - **Do** derive a shape from real data wherever it shows a quantity.
 - **Do** change Ground in `app/globals.css`, `app/layout.tsx`, the canvas, the backdrop and the icon and social images together, since each reads its own copy.
 - **Do** recapture both still images in `public/rooms/` whenever a shape or its layout changes.
-- **Do** keep the form dimmed wherever it can pass behind words.
+- **Do** keep the form away from words: dim it on desktop, and use the solid sheet on phones.
 - **Do** check every new surface in all three tiers and in list view.
 
 ### Don't:

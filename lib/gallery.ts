@@ -30,7 +30,7 @@ export const CAMERA_FOV = 35;
 export function formLayout(stop: Stop, width: number, height: number, phone: boolean) {
   const visibleHeight = 2 * Math.tan((CAMERA_FOV / 2) * (Math.PI / 180)) * CAMERA_DISTANCE;
   const visibleWidth = visibleHeight * (width / height);
-  if (phone) return { x: 0, y: visibleHeight * 0.24, scale: visibleWidth * (stop.id === "top" ? 0.4 : 0.32) };
+  if (phone) return { x: 0, y: visibleHeight * 0.24, scale: visibleWidth * (stop.id === "top" ? 0.42 : 0.38) };
   if (stop.id === "top") return { x: 0, y: visibleHeight * 0.2, scale: Math.min(visibleWidth * 0.44, visibleHeight * 0.72) };
   const gutter = Math.max(16, Math.min(56, width * 0.04));
   const textEdge = stop.width * 16 + gutter;
@@ -69,7 +69,9 @@ export function detectTier(): Tier {
   }
   const coarse = window.matchMedia("(pointer: coarse)").matches;
   const nav = navigator as Navigator & { deviceMemory?: number };
-  const weak = (nav.deviceMemory ?? 8) <= 3 || navigator.hardwareConcurrency <= 4;
-  if (coarse && weak) return "still";
+  // Only trust deviceMemory here. iPhones don't report it, and browsers can
+  // under-report core counts, so a capable phone must not lose the form.
+  // Weak devices that slip through are caught by the live performance monitor.
+  if (coarse && (nav.deviceMemory ?? 8) <= 3) return "still";
   return coarse || window.innerWidth < 768 ? "phone" : "full";
 }

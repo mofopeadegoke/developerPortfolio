@@ -140,14 +140,36 @@ html[data-stage="ready"]:not([data-view="list"]):not([data-tier="still"]) .hero-
 /* Phones: the form holds the upper screen, the words follow below it. */
 @media (max-width: 767px) {
   .room {
-    padding-top: 56svh;
-    padding-bottom: 3rem;
+    padding: 62svh 0 0;
     min-height: 0;
   }
   .room-entrance {
     min-height: 100svh;
-    padding-top: 46svh;
-    padding-bottom: 1.25rem;
+    padding: 44svh 0 0;
+  }
+  /* The words arrive on a solid sheet, so the form above them stays at full
+     brightness and is never left glowing behind text. */
+  .plate {
+    width: 100%;
+    padding: 0.5rem var(--gutter) 3rem;
+    background: var(--ground);
+  }
+  .plate::before {
+    content: "";
+    position: absolute;
+    inset: -5rem 0 auto;
+    height: 5rem;
+    background: linear-gradient(to bottom, transparent, var(--ground));
+    pointer-events: none;
+  }
+  /* The sheet's lower edge fades too, so it never cuts across the form. */
+  .plate::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 -5rem;
+    height: 5rem;
+    background: linear-gradient(to top, transparent, var(--ground));
+    pointer-events: none;
   }
 }
 
@@ -172,7 +194,7 @@ html[data-tier="still"] .room-still::before {
 @media (max-width: 767px) {
   html[data-tier="still"] .room-still {
     inset: 3.5rem 0 auto;
-    height: calc(54svh - 3.5rem);
+    height: calc(62svh - 3.5rem);
   }
   html[data-tier="still"] .room-entrance .room-still {
     height: calc(44svh - 3.5rem);
@@ -198,10 +220,15 @@ html[data-view="list"] .room-entrance {
 html[data-view="list"] .room:first-of-type {
   padding-top: 6.5rem;
 }
+html[data-view="list"] .plate::before,
+html[data-view="list"] .plate::after {
+  display: none;
+}
 html[data-view="list"] .plate {
   width: min(100%, 46rem);
   margin-inline: auto;
-  padding-bottom: 2.5rem;
+  padding: 0 0 2.5rem;
+  background: none;
   border-bottom: 1px solid var(--rule);
 }
 

@@ -70,10 +70,10 @@ function Backdrop({ enabled }: { enabled: boolean }) {
 
 function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => void; onReady: () => void }) {
   const phone = tier === "phone";
-  const side = phone ? 170 : 300;
+  const side = phone ? 230 : 300;
   const size = useThree((state) => state.size);
   const setDpr = useThree((state) => state.setDpr);
-  const { material, glow } = useMemo(() => createFormMaterial(side, Math.min(window.devicePixelRatio, 1.5)), [side]);
+  const { material, glow } = useMemo(() => createFormMaterial(side), [side]);
   const [ready, setReady] = useState(false);
   const [shed, setShed] = useState(0);
 
@@ -184,8 +184,27 @@ function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => voi
     const isWord = (index: number) => ["top", "about", "contact"].includes(stops[index].id);
     const rest = (index: number) => (stops[index].id === "top" ? 0.005 : isWord(index) ? 0.012 : 0.03);
     uniforms.uRest.value = THREE.MathUtils.lerp(rest(from), rest(to), mix);
-    const boost = (index: number) => (phone && stops[index].id !== "top" ? 1.5 : 1);
-    uniforms.uBoost.value = THREE.MathUtils.lerp(boost(from), boost(to), mix);
+
+    // Point sizes are in drawing pixels, so they follow the live pixel ratio.
+    const ratio = state.gl.getPixelRatio();
+    uniforms.uSize.value = 21 * ratio;
+    uniforms.uMaxSize.value = 8 * ratio;
+    glow.uniforms.uSize.value = 147 * ratio;
+    glow.uniforms.uMaxSize.value = 40 * ratio;
+
+    uniforms.uTurn.value = state.clock.elapsedTime * 0.22 + scroll * 0.0012;
+    const wormhole = stops.findIndex((stop) => stop.id === "wormhole");
+    const inTunnel = (index: number) => (index === wormhole ? 1 : 0);
+    uniforms.uTunnel.value = THREE.MathUtils.lerp(inTunnel(from), inTunnel(to), mix * mix * (3 - 2 * mix));
+    uniforms.uTunnelX.value = formLayout(stops[wormhole], size.width, size.height, phone).x;
+    uniforms.uClear.value = phone ? 0 : uniforms.uTunnel.value;
+    // The tunnel spreads the same particles over the whole screen.
+    uniforms.uBoost.value = 1 + uniforms.uTunnel.value * (phone ? 0.1 : 1.5);
+    uniforms.uTunnelScale.value = phone ? 0.5 : 1;
+    // A phone packs the same shape into far fewer pixels, so only the dense
+    // name keeps full strength; the rest would burn out to white.
+    const strength = (index: number) => (phone && stops[index].id !== "top" ? 0.58 : 1);
+    uniforms.uAlpha.value = THREE.MathUtils.lerp(strength(from), strength(to), mix);
 
     const a = formLayout(stops[from], size.width, size.height, phone);
     const b = formLayout(stops[to], size.width, size.height, phone);
@@ -204,16 +223,9 @@ function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => voi
     uniforms.uBurst.value = burst.current;
     uniforms.uPointer.value.lerp(pointerGoal.current, 1 - Math.exp(-9 * delta));
 
-    // Words must stay readable. On phones they scroll across the form, so it
-    // steps back from just after a section starts until just before the next.
-    // On desktop the form only reaches the words while it travels.
-    let dim = 1 - Math.sin(Math.PI * mix) * 0.62;
-    if (phone) {
-      const list = anchors.current;
-      let current = 0;
-      while (current < list.length - 1 && scroll >= list[current + 1] - viewport * 0.05) current++;
-      dim = scroll > list[current] + viewport * 0.14 ? 0.16 : 1;
-    }
+    // On desktop the form only reaches the words while it travels, so it steps
+    // back then. On phones the words slide over it on a solid sheet instead.
+    const dim = phone ? 1 : 1 - Math.sin(Math.PI * mix) * 0.62;
     uniforms.uDim.value = THREE.MathUtils.damp(uniforms.uDim.value, dim, 6, delta);
   });
 
@@ -245,7 +257,7 @@ export default function GalleryCanvas({ tier, onFallback, onReady }: { tier: Tie
   return (
     <Canvas
       camera={{ fov: CAMERA_FOV, position: [0, 0, CAMERA_DISTANCE], near: 0.1, far: 60 }}
-      dpr={[1, 1.5]}
+      dpr={tier === "phone" ? [1, 2] : [1, 1.5]}
       gl={{ antialias: false, powerPreference: "high-performance" }}
       style={{ pointerEvents: "none" }}
     >
