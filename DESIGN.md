@@ -263,7 +263,7 @@ The signature component: one point cloud, drawn with `react-three-fiber`, that t
 
 **The Real Shape Rule.** Every shape is generated from code and, where it shows a quantity, from real data. Experience slabs are as long as each role, Skills columns are as tall as each group, the gear is the same involute profile as the Gear Library, and 3.81 is the actual CGPA.
 
-**The Readable Words Rule.** The form never competes with reading. On desktop it dims to 20% at the midpoint of a rebuild, the only time it reaches the words. On phones the words scroll across it, so it steps back to 16% from just after a stop begins until just before the next. On phones the words arrive on a solid Ground sheet with faded edges, so the form above them stays at full strength instead of dimming.
+**The Readable Words Rule.** The form never competes with reading. On desktop it dims to 38% at the midpoint of a rebuild, the only time it reaches the words. On phones the words arrive on a solid Ground sheet with faded edges, so the form above them stays at full strength instead of dimming.
 
 The name, 3.81 and the @ use Archivo from the subset at `public/fonts/gallery-display.json`, which holds only the glyphs in use, so new letters in the form need a new subset.
 
