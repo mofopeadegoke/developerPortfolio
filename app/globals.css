@@ -116,14 +116,25 @@
   justify-content: flex-end;
   padding-bottom: 2.5rem;
 }
-html[data-stage="ready"]:not([data-view="list"]) .hero-name,
-html[data-tier="still"]:not([data-view="list"]) .hero-name {
+html[data-stage="ready"]:not([data-view="list"]):not([data-tier="still"]) .hero-name {
   position: absolute;
   width: 1px;
   height: 1px;
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* The still image carries the name on desktop. Phones keep the live heading. */
+@media (min-width: 768px) {
+  html[data-tier="still"]:not([data-view="list"]) .hero-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
 
 /* Phones: the form holds the upper screen, the words follow below it. */

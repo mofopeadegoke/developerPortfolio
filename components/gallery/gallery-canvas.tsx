@@ -68,7 +68,7 @@ function Backdrop({ enabled }: { enabled: boolean }) {
   );
 }
 
-function Form({ tier, onFallback }: { tier: Tier; onFallback: () => void }) {
+function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => void; onReady: () => void }) {
   const phone = tier === "phone";
   const side = phone ? 170 : 300;
   const size = useThree((state) => state.size);
@@ -116,6 +116,8 @@ function Form({ tier, onFallback }: { tier: Tier; onFallback: () => void }) {
       texture.needsUpdate = true;
       material.uniforms.uShapes.value = texture;
       setReady(true);
+      // Only now can the name stand in for the page heading.
+      onReady();
     }).then(() => {
       if (!cancelled && texture) texture.needsUpdate = true;
     });
@@ -123,7 +125,7 @@ function Form({ tier, onFallback }: { tier: Tier; onFallback: () => void }) {
       cancelled = true;
       texture?.dispose();
     };
-  }, [material, phone, side]);
+  }, [material, onReady, phone, side]);
 
   useEffect(() => {
     const measure = () => {
@@ -177,6 +179,14 @@ function Form({ tier, onFallback }: { tier: Tier; onFallback: () => void }) {
     uniforms.uMix.value = mix;
     uniforms.uTime.value += Math.min(delta, 0.05);
 
+    // Words must keep their letterforms, so they creep far less than the
+    // solid shapes. Phone shapes need bigger points than the dense name.
+    const isWord = (index: number) => ["top", "about", "contact"].includes(stops[index].id);
+    const rest = (index: number) => (stops[index].id === "top" ? 0.005 : isWord(index) ? 0.012 : 0.03);
+    uniforms.uRest.value = THREE.MathUtils.lerp(rest(from), rest(to), mix);
+    const boost = (index: number) => (phone && stops[index].id !== "top" ? 1.5 : 1);
+    uniforms.uBoost.value = THREE.MathUtils.lerp(boost(from), boost(to), mix);
+
     const a = formLayout(stops[from], size.width, size.height, phone);
     const b = formLayout(stops[to], size.width, size.height, phone);
     form.position.set(THREE.MathUtils.lerp(a.x, b.x, mix), THREE.MathUtils.lerp(a.y, b.y, mix), 0);
@@ -197,7 +207,7 @@ function Form({ tier, onFallback }: { tier: Tier; onFallback: () => void }) {
     // Words must stay readable. On phones they scroll across the form, so it
     // steps back from just after a section starts until just before the next.
     // On desktop the form only reaches the words while it travels.
-    let dim = 1 - Math.sin(Math.PI * mix) * 0.8;
+    let dim = 1 - Math.sin(Math.PI * mix) * 0.62;
     if (phone) {
       const list = anchors.current;
       let current = 0;
@@ -237,11 +247,10 @@ export default function GalleryCanvas({ tier, onFallback, onReady }: { tier: Tie
       camera={{ fov: CAMERA_FOV, position: [0, 0, CAMERA_DISTANCE], near: 0.1, far: 60 }}
       dpr={[1, 1.5]}
       gl={{ antialias: false, powerPreference: "high-performance" }}
-      onCreated={onReady}
       style={{ pointerEvents: "none" }}
     >
       <color attach="background" args={[GROUND]} />
-      <Form tier={tier} onFallback={onFallback} />
+      <Form tier={tier} onFallback={onFallback} onReady={onReady} />
     </Canvas>
   );
 }

@@ -6,7 +6,7 @@ import * as THREE from "three";
 
 const vertexShader = /* glsl */ `
   uniform highp sampler2DArray uShapes;
-  uniform float uFrom, uTo, uMix, uTime, uBurst, uVelocity, uSize, uSide;
+  uniform float uFrom, uTo, uMix, uTime, uBurst, uVelocity, uSize, uSide, uRest, uBoost;
   uniform vec3 uPointer, uOrigin;
   attribute float aSeed;
   varying float vShade;
@@ -35,7 +35,7 @@ const vertexShader = /* glsl */ `
     vec2 g = liquidFlow(p.zxy * 1.2 - aSeed, uTime * 0.3);
     // At rest the surface creeps like molten metal. In transit the form draws
     // in and swirls round its axis, so shapes pour instead of scattering.
-    p += vec3(f.x, g.y, f.y * g.x) * (0.03 + travel * 0.32);
+    p += vec3(f.x, g.y, f.y * g.x) * (uRest + travel * 0.32);
     float swirl = travel * (1.3 + aSeed * 1.8);
     p.xz = mat2(cos(swirl), -sin(swirl), sin(swirl), cos(swirl)) * p.xz;
     p.xy *= 1.0 - travel * 0.5;
@@ -57,14 +57,14 @@ const vertexShader = /* glsl */ `
 
     vec4 view = viewMatrix * world;
     gl_Position = projectionMatrix * view;
-    gl_PointSize = uSize * (0.6 + aSeed * 0.8) / -view.z;
+    gl_PointSize = uSize * uBoost * (0.6 + aSeed * 0.8) / -view.z;
     vShade = mix(a.w, b.w, t);
     vHeat = clamp(travel * 0.55 + reach * 0.9 + uBurst * 0.5, 0.0, 1.0);
   }
 `;
 
 const fragmentShader = /* glsl */ `
-  uniform float uDim, uAlpha;
+  uniform float uDim, uAlpha, uBoost;
   varying float vShade;
   varying float vHeat;
 
@@ -74,7 +74,7 @@ const fragmentShader = /* glsl */ `
     float soft = smoothstep(0.5, 0.08, d);
     vec3 colour = mix(vec3(0.5, 0.13, 0.04), vec3(1.0, 0.52, 0.2), vShade);
     colour = mix(colour, vec3(1.0, 0.86, 0.62), vShade * vShade * vShade * 0.75 + vHeat * 0.35);
-    gl_FragColor = vec4(colour, soft * (0.16 + 0.84 * vShade + vHeat * 0.25) * uDim * uAlpha);
+    gl_FragColor = vec4(colour, soft * (0.16 + 0.84 * vShade + vHeat * 0.25) * uDim * uAlpha * uBoost);
   }
 `;
 
@@ -95,6 +95,8 @@ export function createFormMaterial(side: number, pixelRatio: number) {
       uVelocity: { value: 0 },
       uDim: { value: 1 },
       uAlpha: { value: 1 },
+      uRest: { value: 0.03 },
+      uBoost: { value: 1 },
       uSide: { value: side },
       uSize: { value: (side > 200 ? 21 : 19) * pixelRatio },
       uPointer: { value: new THREE.Vector3(99, 99, 0) },

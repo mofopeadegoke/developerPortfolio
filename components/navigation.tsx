@@ -17,7 +17,7 @@ const links = [
 export function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { view, toggleView } = useGalleryView();
-  const viewLabel = view === "list" ? "Gallery view" : "List view";
+  const viewLabel = view === "list" ? "3D view" : "List view";
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-rule bg-ground">

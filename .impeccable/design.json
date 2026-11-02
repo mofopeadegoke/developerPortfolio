@@ -1,158 +1,190 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-02T12:55:45.711Z",
+  "generatedAt": "2026-11-02T13:47:46.000Z",
   "title": "Design System: Daniel Adegoke",
   "extensions": {
     "colorMeta": {
-      "ultramarine": {
+      "copper": {
         "role": "primary",
-        "displayName": "Ultramarine",
-        "canonical": "#1b2fd0",
-        "oklch": "oklch(43.1% 0.240 266.9)",
+        "displayName": "Copper",
+        "canonical": "#e8894f",
+        "oklch": "oklch(72.0% 0.137 50.5)",
         "tonalRamp": [
-          "#020036",
-          "#080077",
-          "#140ebb",
-          "#2442e1",
-          "#436dfd",
-          "#7499fc",
-          "#aac3fe",
-          "#e7eeff"
+          "#1a0400",
+          "#3e1700",
+          "#662d01",
+          "#924404",
+          "#bf6427",
+          "#e8894f",
+          "#feb992",
+          "#ffeade"
         ]
       },
-      "vermilion": {
+      "amber": {
         "role": "secondary",
-        "displayName": "Vermilion",
-        "canonical": "#e8552f",
-        "oklch": "oklch(64.1% 0.189 35.3)",
+        "displayName": "Amber",
+        "canonical": "#f6bc7a",
+        "oklch": "oklch(83.4% 0.107 69.1)",
         "tonalRamp": [
-          "#1f0000",
-          "#470a00",
-          "#741b01",
-          "#a72900",
-          "#d6431b",
-          "#fd6943",
-          "#fdad98",
-          "#ffe9e3"
+          "#160700",
+          "#361e00",
+          "#5a3703",
+          "#825108",
+          "#a97330",
+          "#d09856",
+          "#f8be7c",
+          "#feebd6"
         ]
       },
-      "teal": {
+      "ember-deep": {
         "role": "tertiary",
-        "displayName": "Teal",
-        "canonical": "#0f7a6c",
-        "oklch": "oklch(52.1% 0.091 180.8)",
+        "displayName": "Ember Deep",
+        "canonical": "#80210a",
+        "oklch": "oklch(40.0% 0.133 34.1)",
         "tonalRamp": [
-          "#000f0c",
-          "#002b25",
-          "#004b42",
-          "#056d60",
-          "#2f8f80",
-          "#56b1a1",
-          "#7dd8c7",
-          "#bafff1"
+          "#200000",
+          "#470a00",
+          "#761600",
+          "#9a3a25",
+          "#c25e48",
+          "#ec836b",
+          "#ffb6a4",
+          "#ffe9e4"
         ]
       },
-      "label-white": {
-        "role": "neutral",
-        "displayName": "Label White",
-        "canonical": "#fbfbf9",
-        "oklch": "oklch(98.8% 0.003 106.4)",
+      "ember-bright": {
+        "role": "tertiary",
+        "displayName": "Ember Bright",
+        "canonical": "#ff8533",
+        "oklch": "oklch(74.1% 0.173 50.1)",
         "tonalRamp": [
-          "#0b0b0a",
-          "#242423",
-          "#40403e",
-          "#5e5e5c",
-          "#7d7d7b",
-          "#9e9e9d",
-          "#c4c4c2",
-          "#eeeeec"
+          "#1a0400",
+          "#3d1800",
+          "#672c00",
+          "#944300",
+          "#c75e06",
+          "#f77e2a",
+          "#fdb993",
+          "#ffeadf"
         ]
       },
-      "ink": {
-        "role": "neutral",
-        "displayName": "Ink",
-        "canonical": "#14151a",
-        "oklch": "oklch(19.7% 0.010 276.5)",
+      "ember-hot": {
+        "role": "tertiary",
+        "displayName": "Ember Hot",
+        "canonical": "#ffdb9e",
+        "oklch": "oklch(90.8% 0.087 80.4)",
         "tonalRamp": [
-          "#0a0b0f",
-          "#232429",
-          "#3e3f45",
-          "#5c5d63",
-          "#7b7d83",
-          "#9c9ea5",
-          "#c2c4cb",
-          "#eceef5"
+          "#130900",
+          "#322000",
+          "#543b03",
+          "#775819",
+          "#9b7a3f",
+          "#c19f64",
+          "#e8c589",
+          "#feeccd"
         ]
       },
-      "quiet": {
+      "ground": {
         "role": "neutral",
-        "displayName": "Quiet",
-        "canonical": "#4a4d57",
-        "oklch": "oklch(42.1% 0.017 272.4)",
+        "displayName": "Ground",
+        "canonical": "#0b0807",
+        "oklch": "oklch(13.8% 0.006 41.9)",
         "tonalRamp": [
-          "#090b12",
-          "#21242c",
-          "#3c3f49",
-          "#5a5d68",
-          "#7a7d88",
-          "#9b9ea9",
-          "#c0c4d0",
-          "#eaeefa"
+          "#0e0a09",
+          "#272322",
+          "#433f3d",
+          "#615c5b",
+          "#847f7d",
+          "#a8a3a2",
+          "#cec9c7",
+          "#f2edeb"
+        ]
+      },
+      "char": {
+        "role": "neutral",
+        "displayName": "Char",
+        "canonical": "#1a0c07",
+        "oklch": "oklch(17.3% 0.027 41.5)",
+        "tonalRamp": [
+          "#150704",
+          "#2f201a",
+          "#4c3b35",
+          "#6b5952",
+          "#8f7b74",
+          "#b4a098",
+          "#dbc5bd",
+          "#fee9e2"
+        ]
+      },
+      "smoulder": {
+        "role": "neutral",
+        "displayName": "Smoulder",
+        "canonical": "#4a1a0a",
+        "oklch": "oklch(28.9% 0.078 38.3)",
+        "tonalRamp": [
+          "#1e0100",
+          "#421203",
+          "#622f1f",
+          "#834d3c",
+          "#a9705e",
+          "#d09481",
+          "#f8baa6",
+          "#ffe9e2"
         ]
       },
       "rule": {
         "role": "neutral",
         "displayName": "Rule",
-        "canonical": "#d6d7d3",
-        "oklch": "oklch(87.7% 0.006 117.9)",
+        "canonical": "#33261e",
+        "oklch": "oklch(28.1% 0.024 53.1)",
         "tonalRamp": [
-          "#0b0b09",
-          "#242421",
-          "#3f403d",
-          "#5d5e5b",
-          "#7d7e7a",
-          "#9e9f9b",
-          "#c4c5c1",
-          "#eeefeb"
+          "#130803",
+          "#2e2119",
+          "#4a3c34",
+          "#695a51",
+          "#8c7d73",
+          "#b2a197",
+          "#d8c7bc",
+          "#fcebe0"
         ]
       },
-      "plinth-charcoal": {
+      "quiet": {
         "role": "neutral",
-        "displayName": "Plinth Charcoal",
-        "canonical": "#23252f",
-        "oklch": "oklch(26.7% 0.019 276.2)",
+        "displayName": "Quiet",
+        "canonical": "#bcaea2",
+        "oklch": "oklch(75.9% 0.023 63.1)",
         "tonalRamp": [
-          "#090a13",
-          "#21232d",
-          "#3d3f4a",
-          "#5a5d69",
-          "#7a7d89",
-          "#9b9eaa",
-          "#c0c3d1",
-          "#ebeefc"
+          "#120903",
+          "#2c2218",
+          "#493d33",
+          "#675b50",
+          "#8b7e72",
+          "#b0a296",
+          "#d6c8bb",
+          "#faecdf"
         ]
       },
-      "liquid-silver": {
+      "text": {
         "role": "neutral",
-        "displayName": "Liquid Silver",
-        "canonical": "#f4f5f8",
-        "oklch": "oklch(97.0% 0.004 271.4)",
+        "displayName": "Text",
+        "canonical": "#f4ece4",
+        "oklch": "oklch(94.7% 0.014 67.7)",
         "tonalRamp": [
-          "#0a0b0d",
-          "#232426",
-          "#3f4042",
-          "#5d5d60",
-          "#7c7d80",
-          "#9d9ea1",
-          "#c3c4c7",
-          "#edeef1"
+          "#0f0a06",
+          "#29231d",
+          "#453e38",
+          "#635c56",
+          "#867f78",
+          "#aba39c",
+          "#d1c9c1",
+          "#f5ede5"
         ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "The name as h1 on the entrance label."
+        "purpose": "The name as h1. It is visible in list view and until the stage is ready. Elsewhere it stays in the document for assistive technology while the form or the still shows the name."
       },
       "headline": {
         "displayName": "Headline",
@@ -164,41 +196,43 @@
       },
       "subtitle": {
         "displayName": "Subtitle",
-        "purpose": "Job titles, degree, and Competitions."
+        "purpose": "Job titles, the degree, and Competitions."
+      },
+      "group": {
+        "displayName": "Group",
+        "purpose": "Skill group names."
+      },
+      "contact-email": {
+        "displayName": "Contact Email",
+        "purpose": "The email address, the largest link on the site, breaking anywhere so it never overflows."
       },
       "wordmark": {
         "displayName": "Wordmark",
         "purpose": "The name in the navigation bar."
       },
+      "role": {
+        "displayName": "Role",
+        "purpose": "The role line in the first viewport, in Quiet."
+      },
       "lead": {
         "displayName": "Lead",
-        "purpose": "The line that states a result."
+        "purpose": "The line that states a result. About paragraphs use the same size at line-height 1.625."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Label prose."
+        "purpose": "Prose. Dash lists open up to 1.6."
       },
       "caption": {
         "displayName": "Caption",
-        "purpose": "Technology lists, dates, and availability, in Quiet."
-      },
-      "mark": {
-        "displayName": "Mark",
-        "purpose": "The room mark at the foot of a label."
+        "purpose": "Technology lists, dates, availability and the footer, in Quiet. Dates use tabular figures."
       }
     },
-    "shadows": [
-      {
-        "name": "label-lift",
-        "value": "0 18px 40px -22px rgb(8 10 30 / 0.55)",
-        "purpose": "Wall labels only, lifting the label off the moving scene. Removed in list view."
-      }
-    ],
+    "shadows": [],
     "motion": [
       {
         "name": "stage-reveal",
-        "value": "900ms cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "The stage fades in over the page background once the canvas is ready."
+        "value": "1200ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The stage fades in over the ground once the canvas is ready."
       },
       {
         "name": "button-state",
@@ -206,19 +240,34 @@
         "purpose": "Button colour transitions."
       },
       {
-        "name": "walk",
+        "name": "rebuild",
         "value": "smoothstep over the last 0.9 viewport, damped at rate 5",
-        "purpose": "Camera movement between stops; it holds while the label is read."
+        "purpose": "Movement between shapes; the form holds while the words are read."
       },
       {
-        "name": "away-light",
-        "value": "0.5",
-        "purpose": "Brightness of a room the camera has left."
+        "name": "pour-stagger",
+        "value": "clamp(mix * 1.7 - seed * 0.7)",
+        "purpose": "Per-point departure, so shapes pour rather than fade."
       },
       {
-        "name": "sculpture-spin",
-        "value": "0.22 to 0.45 rad/s",
-        "purpose": "Slow rotation or swing of the current sculpture."
+        "name": "sway",
+        "value": "0.06 to 0.3 rad, at 0.3 rad/s",
+        "purpose": "Slow turn of the form at rest."
+      },
+      {
+        "name": "burst-decay",
+        "value": "damped at rate 2.6",
+        "purpose": "How the form settles after a click."
+      },
+      {
+        "name": "streak",
+        "value": "velocity damped at rate 7, up to 3 scene units",
+        "purpose": "Vertical stretch on fast scroll."
+      },
+      {
+        "name": "reading-dim",
+        "value": "0.2 at mid-rebuild on desktop, 0.16 while reading on phones, damped at rate 6",
+        "purpose": "Keeps the form from competing with the words."
       },
       {
         "name": "reduced-motion",
@@ -246,9 +295,9 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The main action on a label: Download CV.",
+      "description": "The main action: Download CV.",
       "html": "<a class=\"ds-btn-primary\" href=\"#\">Download CV</a>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: 1px solid var(--ink, #14151a); border-radius: 0; font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-weight: 500; text-decoration: none; transition: color 200ms, background-color 200ms, border-color 200ms; background: var(--ink, #14151a); color: var(--label, #fbfbf9); } .ds-btn-primary:hover { background: var(--ultramarine, #1b2fd0); border-color: var(--ultramarine, #1b2fd0); } .ds-btn-primary:focus-visible { outline: 2px solid var(--ultramarine, #1b2fd0); outline-offset: 3px; }"
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: 1px solid var(--copper, #e8894f); border-radius: 0; font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-weight: 500; text-decoration: none; transition: color 200ms, background-color 200ms, border-color 200ms; background: var(--copper, #e8894f); color: var(--ground, #0b0807); } .ds-btn-primary:hover { background: var(--amber, #f6bc7a); border-color: var(--amber, #f6bc7a); } .ds-btn-primary:focus-visible { outline: 2px solid var(--amber, #f6bc7a); outline-offset: 3px; }"
     },
     {
       "name": "Outline Button",
@@ -256,81 +305,70 @@
       "refersTo": "button-outline",
       "description": "The second action beside a primary button: Email me.",
       "html": "<a class=\"ds-btn-outline\" href=\"#\">Email me</a>",
-      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: 1px solid var(--ink, #14151a); border-radius: 0; font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-weight: 500; text-decoration: none; transition: color 200ms, background-color 200ms, border-color 200ms; background: transparent; color: var(--ink, #14151a); } .ds-btn-outline:hover { background: var(--ink, #14151a); color: var(--label, #fbfbf9); } .ds-btn-outline:focus-visible { outline: 2px solid var(--ultramarine, #1b2fd0); outline-offset: 3px; }"
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: 1px solid var(--copper, #e8894f); border-radius: 0; font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-weight: 500; text-decoration: none; transition: color 200ms, background-color 200ms, border-color 200ms; background: transparent; color: var(--text, #f4ece4); } .ds-btn-outline:hover { background: var(--copper, #e8894f); color: var(--ground, #0b0807); } .ds-btn-outline:focus-visible { outline: 2px solid var(--amber, #f6bc7a); outline-offset: 3px; }"
     },
     {
       "name": "Text Link",
       "kind": "custom",
-      "description": "Ink text with an ultramarine underline, the action colour on a label.",
+      "description": "Text with a Copper underline, turning Amber on hover.",
       "html": "<a class=\"ds-link\" href=\"#\">View the source<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></a>",
-      "css": ".ds-link { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-weight: 500; color: var(--ink, #14151a); text-decoration: underline; text-decoration-color: var(--ultramarine, #1b2fd0); text-underline-offset: 0.2em; transition: color 150ms; } .ds-link:hover { color: var(--ultramarine, #1b2fd0); } .ds-link:focus-visible { outline: 2px solid var(--ultramarine, #1b2fd0); outline-offset: 3px; }"
+      "css": ".ds-link { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-weight: 500; color: var(--text, #f4ece4); text-decoration: underline; text-decoration-color: var(--copper, #e8894f); text-underline-offset: 0.2em; transition: color 150ms; } .ds-link:hover { color: var(--amber, #f6bc7a); } .ds-link:focus-visible { outline: 2px solid var(--amber, #f6bc7a); outline-offset: 3px; }"
     },
     {
       "name": "Navigation Bar",
       "kind": "nav",
       "refersTo": "nav-bar",
-      "description": "Fixed opaque bar with the wordmark, section links, and the view switch.",
+      "description": "Fixed Ground bar with the wordmark, section links and the view switch.",
       "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-mark\" href=\"#\">Daniel Adegoke</a><span class=\"ds-nav-links\"><a href=\"#\">Experience</a><a href=\"#\">Projects</a><a href=\"#\">Skills</a><button type=\"button\">List view</button></span></nav>",
-      "css": ".ds-nav { display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 24px; background: var(--label, #fbfbf9); border-bottom: 1px solid var(--rule, #d6d7d3); font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; } .ds-nav-mark { font-family: var(--font-archivo, Archivo), var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-size: 1.125rem; font-weight: 800; font-stretch: 115%; letter-spacing: -0.01em; color: var(--ink, #14151a); text-decoration: none; } .ds-nav-links { display: flex; align-items: center; gap: 20px; } .ds-nav-links a { font-size: 0.95rem; color: var(--quiet, #4a4d57); text-decoration: none; transition: color 150ms; } .ds-nav-links a:hover { color: var(--ink, #14151a); } .ds-nav-links button { padding: 0; border: 0; background: none; font: inherit; font-size: 0.95rem; font-weight: 500; color: var(--ink, #14151a); text-decoration: underline; text-decoration-color: var(--ultramarine, #1b2fd0); text-underline-offset: 4px; cursor: pointer; transition: color 150ms; } .ds-nav-links button:hover { color: var(--ultramarine, #1b2fd0); } .ds-nav a:focus-visible, .ds-nav button:focus-visible { outline: 2px solid var(--ultramarine, #1b2fd0); outline-offset: 3px; }"
+      "css": ".ds-nav { display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 24px; background: var(--ground, #0b0807); border-bottom: 1px solid var(--rule, #33261e); color: var(--text, #f4ece4); font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; } .ds-nav-mark { font-family: var(--font-archivo, Archivo), var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-size: 1.125rem; font-weight: 800; font-stretch: 115%; letter-spacing: -0.01em; color: var(--text, #f4ece4); text-decoration: none; } .ds-nav-links { display: flex; align-items: center; gap: 20px; } .ds-nav-links a { font-size: 0.95rem; color: var(--quiet, #bcaea2); text-decoration: none; transition: color 150ms; } .ds-nav-links a:hover { color: var(--text, #f4ece4); } .ds-nav-links button { padding: 0; border: 0; background: none; font: inherit; font-size: 0.95rem; font-weight: 500; color: var(--text, #f4ece4); text-decoration: underline; text-decoration-color: var(--copper, #e8894f); text-underline-offset: 4px; cursor: pointer; transition: color 150ms; } .ds-nav-links button:hover { color: var(--amber, #f6bc7a); } .ds-nav a:focus-visible { outline: 2px solid var(--amber, #f6bc7a); outline-offset: 3px; } .ds-nav button:focus-visible { outline: 2px solid var(--amber, #f6bc7a); outline-offset: 3px; }"
     },
     {
-      "name": "Wall Label",
-      "kind": "card",
-      "refersTo": "wall-label",
-      "description": "The opaque square container that holds every word, shown on a room colour with its hairline and room mark.",
-      "html": "<div class=\"ds-room\"><div class=\"ds-label\"><h3>Project name</h3><p class=\"ds-label-role\">Role in the project</p><p class=\"ds-label-lead\">One line that states the result.</p><ul class=\"ds-label-dash\"><li>A specific thing that shipped</li><li>Another specific thing</li></ul><ul class=\"ds-label-tech\"><li>TypeScript</li><li>React</li><li>PostgreSQL</li></ul><p class=\"ds-label-mark\">Room 3 of 6, case 1 of 6</p></div></div>",
-      "css": ".ds-room { padding: 32px; background: var(--teal, #0f7a6c); overflow: hidden; } .ds-label { position: relative; width: min(100%, 31rem); padding: clamp(1.5rem, 3vw, 2.5rem); background: var(--label, #fbfbf9); color: var(--ink, #14151a); box-shadow: 0 18px 40px -22px rgb(8 10 30 / 0.55); font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; } .ds-label::after { content: \"\"; position: absolute; top: 4.25rem; left: 100%; width: 32px; height: 1px; background: var(--label, #fbfbf9); } .ds-label h3 { margin: 0; font-family: var(--font-archivo, Archivo), var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-size: 1.875rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; } .ds-label-role { margin: 4px 0 0; color: var(--quiet, #4a4d57); } .ds-label-lead { margin: 16px 0 0; font-size: 1.125rem; line-height: 1.375; } .ds-label-dash { margin: 16px 0 0; padding: 0; list-style: none; } .ds-label-dash li { position: relative; padding-left: 1.1rem; line-height: 1.6; } .ds-label-dash li::before { content: \"\"; position: absolute; top: 0.8em; left: 0; width: 0.55rem; height: 1px; background: var(--quiet, #4a4d57); } .ds-label-tech { display: flex; flex-wrap: wrap; gap: 0.15rem 1rem; margin: 16px 0 0; padding: 0; list-style: none; font-size: 0.875rem; color: var(--quiet, #4a4d57); } .ds-label-mark { margin: 2rem 0 0; padding-top: 0.75rem; border-top: 1px solid var(--rule, #d6d7d3); font-size: 0.8125rem; color: var(--quiet, #4a4d57); }"
-    },
-    {
-      "name": "Room Mark",
+      "name": "Text Column",
       "kind": "custom",
-      "refersTo": "room-mark",
-      "description": "The caption at the foot of a label, giving position in the walk or how to read the sculpture.",
-      "html": "<p class=\"ds-mark\">Room 2 of 6. Each slab is as long as the role.</p>",
-      "css": ".ds-mark { margin: 0; padding-top: 0.75rem; border-top: 1px solid var(--rule, #d6d7d3); font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-size: 0.8125rem; color: var(--quiet, #4a4d57); }"
+      "refersTo": "text-column",
+      "description": "The words at a stop, set straight on Ground with no panel: name, role, result, dash list and technologies.",
+      "html": "<div class=\"ds-ground\"><div class=\"ds-column\"><h3>Project name</h3><p class=\"ds-column-role\">Role in the project</p><p class=\"ds-column-lead\">One line that states the result.</p><ul class=\"ds-column-dash\"><li>A specific thing that shipped</li><li>Another specific thing</li></ul><ul class=\"ds-column-tech\"><li>TypeScript</li><li>React</li><li>PostgreSQL</li></ul></div></div>",
+      "css": ".ds-ground { padding: 32px; background: var(--ground, #0b0807); } .ds-column { width: min(100%, 31rem); color: var(--text, #f4ece4); font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; } .ds-column h3 { margin: 0; font-family: var(--font-archivo, Archivo), var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-size: 1.875rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; } .ds-column-role { margin: 4px 0 0; color: var(--quiet, #bcaea2); } .ds-column-lead { margin: 16px 0 0; font-size: 1.125rem; line-height: 1.375; } .ds-column-dash { margin: 16px 0 0; padding: 0; list-style: none; } .ds-column-dash li { position: relative; padding-left: 1.1rem; line-height: 1.6; } .ds-column-dash li::before { content: \"\"; position: absolute; top: 0.8em; left: 0; width: 0.55rem; height: 1px; background: var(--copper, #e8894f); } .ds-column-tech { display: flex; flex-wrap: wrap; gap: 0.15rem 1rem; margin: 16px 0 0; padding: 0; list-style: none; font-size: 0.875rem; color: var(--quiet, #bcaea2); }"
+    },
+    {
+      "name": "Form Particle",
+      "kind": "custom",
+      "description": "A static specimen of the points in the form, from Ember Deep through Ember Bright to Ember Hot. The form itself is WebGL and cannot render here.",
+      "html": "<div class=\"ds-particles\"><span></span><span></span><span></span></div>",
+      "css": ".ds-particles { display: flex; align-items: center; gap: 28px; padding: 32px; background: var(--ground, #0b0807); } .ds-particles span { width: 36px; height: 36px; border-radius: 50%; } .ds-particles span:nth-child(1) { background: radial-gradient(circle, #80210a 16%, transparent 100%); } .ds-particles span:nth-child(2) { background: radial-gradient(circle, #ff8533 16%, transparent 100%); } .ds-particles span:nth-child(3) { background: radial-gradient(circle, #ffdb9e 16%, transparent 100%); }"
     },
     {
       "name": "List View Entry",
-      "kind": "card",
-      "description": "A wall label in list view: no fill or shadow, divided by a rule, in a centred 46rem column.",
+      "kind": "custom",
+      "description": "A stop in list view: the same words on Ground, in a centred 46rem column with a Rule line below.",
       "html": "<div class=\"ds-list\"><h3>Project name</h3><p>One line that states the result.</p><a href=\"#\">View the source</a></div>",
-      "css": ".ds-list { width: min(100%, 46rem); margin-inline: auto; padding: 0 0 2.5rem; background: var(--label, #fbfbf9); border-bottom: 1px solid var(--rule, #d6d7d3); color: var(--ink, #14151a); font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; } .ds-list h3 { margin: 0; font-family: var(--font-archivo, Archivo), var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-size: 1.875rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; } .ds-list a { color: var(--ink, #14151a); text-decoration: underline; text-decoration-color: var(--ultramarine, #1b2fd0); text-underline-offset: 0.2em; transition: color 150ms; } .ds-list a:hover { color: var(--ultramarine, #1b2fd0); } .ds-list a:focus-visible { outline: 2px solid var(--ultramarine, #1b2fd0); outline-offset: 3px; }"
+      "css": ".ds-list { width: min(100%, 46rem); margin-inline: auto; padding: 0 0 2.5rem; background: var(--ground, #0b0807); border-bottom: 1px solid var(--rule, #33261e); color: var(--text, #f4ece4); font-family: var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; } .ds-list h3 { margin: 0; font-family: var(--font-archivo, Archivo), var(--font-schibsted, 'Schibsted Grotesk'), system-ui, sans-serif; font-size: 1.875rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; } .ds-list a { color: var(--text, #f4ece4); text-decoration: underline; text-decoration-color: var(--copper, #e8894f); text-underline-offset: 0.2em; transition: color 150ms; } .ds-list a:hover { color: var(--amber, #f6bc7a); } .ds-list a:focus-visible { outline: 2px solid var(--amber, #f6bc7a); outline-offset: 3px; }"
     }
   ],
   "narrative": {
-    "northStar": "The Solo Exhibition",
-    "overview": "The site is a building, not a page. A visitor walks one straight axis through saturated rooms, and scrolling is the walk: the camera glides between stops and holds while the visitor reads. Each stop is a piece of work, cast as a liquid-metal sculpture in a glass case on a dark plinth, with a museum label beside it.\n\nTwo layers never mix. The scene is lush, wet and fully lit, and it takes no input. The labels are plain, opaque and square, and they hold every word on the site. All colour and spectacle belong to the scene, and all reading belongs to the label, so a visitor gets the facts at once whether or not the scene ever loads.\n\nThe gallery is one presentation of a plain document. The same labels stand in front of a live scene, in front of captured stills, or alone on white in list view, and the system holds in all of them.",
+    "northStar": "Molten Copper",
+    "overview": "The site is one body of matter. Tens of thousands of points of copper light hold a shape, pour out of it as the visitor scrolls, and settle into the next one: the name, the career, each project, the skills, the degree, and finally an @. There is only ever one form on screen, and it is always the same particles. Nothing is swapped, faded or replaced.\n\nThe form is the main event and the words are its plain counterpart. Text sits directly on the warm near-black ground, with no panel, card or tint behind it, and the form takes the space the text leaves free. Every word is server-rendered HTML, so a visitor reaches the facts without waiting on the form.\n\nThe form is also one presentation of a plain document. The same words stand beside live particles, beside captured stills, or alone in a list view, and the system holds in all of them.",
     "keyCharacteristics": [
-      "One axis: fixed scene behind, labels scrolling over it, alternating left and right of the case.",
-      "Three saturated room colours, each with a fixed job.",
-      "Opaque, square, near-white wall labels with near-black text.",
-      "Silver liquid metal that takes a tint of the room it stands in.",
+      "One form, one set of particles, rebuilt rather than replaced at each stop.",
+      "One colour family of copper, amber and ember glow on a warm near-black.",
+      "Text directly on the dark ground, with no panels or cards.",
+      "A form that answers the visitor: it parts round the cursor, bursts on a click, and streaks on a fast scroll.",
       "Three rendering tiers and a list view, all carrying the same words."
     ],
     "rules": [
       {
-        "name": "The Three Rooms Rule",
-        "body": "Walls are ultramarine, vermilion or teal and nothing else. Every stop takes its colour from the walk in `lib/gallery.ts`, and neighbouring stops of one colour read as one long room. A fourth wall colour is a system change, not an addition.",
+        "name": "The One Family Rule",
+        "body": "Every colour sits in the copper family on near-black. A second hue is a system change, not an accent. The neutrals are warm for the same reason: there is no pure white, pure black or cool grey anywhere.",
         "section": "colors"
       },
       {
-        "name": "The Ultramarine Hand Rule",
-        "body": "On a label, ultramarine means one thing: this can be acted on. It is never a heading colour, a decorative accent, or static text. Remove it from a label and only the interactive elements should change.",
+        "name": "The Amber Answer Rule",
+        "body": "Amber in the interface only ever answers the visitor: hover and focus, never a resting state. If nothing is being pointed at or focused, no amber shows outside the form.",
         "section": "colors"
       },
       {
-        "name": "The Vermilion Wall Rule",
-        "body": "Vermilion is wall light and is never used for reading text. On Label White it reaches only 3.51:1, and it does not appear on labels at all, in any role.",
-        "section": "colors"
-      },
-      {
-        "name": "The Teal Wall Rule",
-        "body": "Teal stays on the walls too. It would pass as text on Label White (5.04:1), and it still does not go there: the rule is about meaning, and on a label the one accent is already spoken for.",
-        "section": "colors"
-      },
-      {
-        "name": "The Metal Carries Scale Rule",
-        "body": "The largest letters on the site are sculpture. Label type peaks at 3.25rem because the metal name holds the room, so labels never compete by growing.",
+        "name": "The Form Carries Scale Rule",
+        "body": "The largest letters on the site are made of particles. HTML type peaks at the Display size, so the words never compete with the form by growing.",
         "section": "typography"
       },
       {
@@ -340,17 +378,17 @@
       },
       {
         "name": "The Sentence Case Rule",
-        "body": "Interface text is sentence case with no wide tracking. Capitals are for the name cast in metal.",
+        "body": "Interface text is sentence case with no wide tracking. Capitals belong to the name in the form.",
         "section": "typography"
       },
       {
-        "name": "The Opaque Label Rule",
-        "body": "Wall labels, the navigation bar and the footer are fully opaque. There is no transparency, no blur and no glass on anything that holds words, because reading never depends on what is behind it. Glass belongs to the vitrines.",
+        "name": "The Glow Is Matter Rule",
+        "body": "Glow comes from the particles themselves, through additive light and a soft halo. It never comes from a CSS shadow, a blur or a gradient on an interface element.",
         "section": "elevation"
       },
       {
-        "name": "The Current Room Rule",
-        "body": "Only the current room animates at full light. A room the camera has left falls to half light and dims further with distance, sculptures animate only within 0.6 of a stop, and neighbouring cases are visible only on the walk between stops.",
+        "name": "The Bare Ground Rule",
+        "body": "Nothing that holds reading text has a panel, card or tint. The navigation bar, the footer and the skip link are filled with Ground itself, so they read as more ground, and they are opaque so the form never passes behind their words.",
         "section": "elevation"
       },
       {
@@ -359,49 +397,49 @@
         "section": "shapes"
       },
       {
-        "name": "The One Hairline Rule",
-        "body": "Each label is tied to its case by exactly one 1px line in Label White, 4.25rem below the label's top edge. It leaves from the side facing the case and its length is measured so it ends on the near edge of the case at any screen width. It is removed on phones and in list view.",
-        "section": "shapes"
-      },
-      {
-        "name": "The Real Data Rule",
-        "body": "A sculpture is generated from code and, where it shows a quantity, from real data. Experience slabs are as long as each role, skills columns are as tall as each group, the About sculpture is the actual CGPA, and the room mark says so.",
+        "name": "The Same Matter Rule",
+        "body": "There is one form and one set of points. A new piece of the site is a new shape for those points, never a second object, model or scene.",
         "section": "components"
       },
       {
-        "name": "The Standing Rule",
-        "body": "Sculptures stand on thin metal rods inside their cases. Nothing floats. Motion is slow rotation or a gentle swing (0.22 to 0.45 radians per second).",
+        "name": "The Real Shape Rule",
+        "body": "Every shape is generated from code and, where it shows a quantity, from real data. Experience slabs are as long as each role, Skills columns are as tall as each group, the gear is the same involute profile as the Gear Library, and 3.81 is the actual CGPA.",
+        "section": "components"
+      },
+      {
+        "name": "The Readable Words Rule",
+        "body": "The form never competes with reading. On desktop it dims to 20% at the midpoint of a rebuild, the only time it reaches the words. On phones the words scroll across it, so it steps back to 16% from just after a stop begins until just before the next.",
         "section": "components"
       },
       {
         "name": "The Shed Heaviest First Rule",
-        "body": "Under sustained load the scene gives up effects one at a time: transmission glass and reflections first, then pixel ratio, then the wall wash, and only then falls back to Still. A visitor never waits on an effect.",
+        "body": "When frame rate declines, the form gives things up one at a time: pixel ratio drops to 1, then the backdrop goes, and only then does the site fall back to Still. A visitor never waits on an effect.",
         "section": "components"
       },
       {
         "name": "The Same Words Rule",
-        "body": "Every presentation carries the same words in the same order. A fact never lives only in the scene: the scene is `aria-hidden`, and nothing in it may be needed to understand the site.",
+        "body": "Every presentation carries the same words in the same order. A fact never lives only in the form: the stage is `aria-hidden`, and nothing in it may be needed to understand the site.",
         "section": "components"
       }
     ],
     "dos": [
-      "Do put every word in a wall label, and keep the label 100% opaque in Label White with Ink or Quiet text.",
-      "Do give each new stop a room colour, a label side, and an id in `lib/gallery.ts`, matching a `data-stop` in the page.",
-      "Do change a room colour in both `app/globals.css` and `lib/gallery.ts`, since the scene and the interface each read their own copy.",
-      "Do cast a new work as a sculpture in the shared liquid metal, standing on a rod in a vitrine on a plinth.",
-      "Do derive a sculpture from real data wherever it shows a quantity.",
-      "Do recapture both still images in `public/rooms/` whenever a scene or a case layout changes.",
+      "Do set reading text directly on Ground, in Text or Quiet.",
+      "Do build each new stop as a shape for the existing points, with an entry in `lib/gallery.ts`, a builder in `components/gallery/form-shapes.ts`, and a matching `data-stop` in the page.",
+      "Do derive a shape from real data wherever it shows a quantity.",
+      "Do change Ground in `app/globals.css`, `app/layout.tsx`, the canvas, the backdrop and the icon and social images together, since each reads its own copy.",
+      "Do recapture both still images in `public/rooms/` whenever a shape or its layout changes.",
+      "Do keep the form dimmed wherever it can pass behind words.",
       "Do check every new surface in all three tiers and in list view."
     ],
     "donts": [
-      "Don't set vermilion as reading text, in any size or weight.",
-      "Don't put teal or vermilion on a label, or use ultramarine on a label for anything that cannot be acted on.",
-      "Don't make a wall label translucent, blurred or glassy, or set reading text directly on the scene.",
-      "Don't round a label, button or any other interface element.",
-      "Don't tie a label to its case with more than the one hairline.",
-      "Don't let any scene element take pointer input or hold a fact that the labels do not.",
-      "Don't run a non-current room at full light or full animation.",
-      "Don't add a fourth room colour or a second metal material."
+      "Don't add a second hue, or a cool or pure neutral.",
+      "Don't put reading text on a panel, card, tint or blur.",
+      "Don't use Amber in the interface for a resting state, or the ember colours in the interface at all.",
+      "Don't round a button or any other interface element.",
+      "Don't add a CSS shadow or glow to an interface element.",
+      "Don't add a second 3D object beside the form, or let a shape fade or cut instead of pouring.",
+      "Don't let the burst fire from text or controls, or let the form hold a fact that the words do not.",
+      "Don't invent a shape's proportions when real data exists for it."
     ]
   }
 }
