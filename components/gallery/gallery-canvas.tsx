@@ -68,9 +68,11 @@ function Backdrop({ enabled }: { enabled: boolean }) {
   );
 }
 
-function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => void; onReady: () => void }) {
+type FormProps = { tier: Tier; tunnel: boolean; onTunnelEnd: () => void; onFallback: () => void; onReady: () => void };
+
+function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
   const phone = tier === "phone";
-  const side = phone ? 230 : 300;
+  const side = phone ? 160 : 300;
   const size = useThree((state) => state.size);
   const setDpr = useThree((state) => state.setDpr);
   const { material, glow } = useMemo(() => createFormMaterial(side), [side]);
@@ -85,6 +87,12 @@ function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => voi
   const burst = useRef(0);
   const pointerGoal = useRef(new THREE.Vector3(99, 99, 0));
   const tilt = useRef({ x: 0, y: 0 });
+  const tunnelGoal = useRef(false);
+  const tunnelAmount = useRef(0);
+
+  useEffect(() => {
+    tunnelGoal.current = tunnel;
+  }, [tunnel]);
 
   const geometry = useMemo(() => {
     const count = side * side;
@@ -149,7 +157,7 @@ function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => voi
     // A click or tap on empty space throws the form apart. Text and links keep
     // their normal behaviour, so selecting words never sets it off.
     const onClick = (event: MouseEvent) => {
-      if ((event.target as Element).closest("a, button, h1, h2, h3, p, li, td, th")) return;
+      if (phone || (event.target as Element).closest("a, button, h1, h2, h3, p, li, td, th")) return;
       toWorld(event.clientX, event.clientY, material.uniforms.uOrigin.value);
       burst.current = 1;
     };
@@ -160,7 +168,7 @@ function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => voi
       window.removeEventListener("pointermove", onPointer);
       window.removeEventListener("click", onClick);
     };
-  }, [material]);
+  }, [material, phone]);
 
   useFrame((state, delta) => {
     const form = points.current;
@@ -177,12 +185,11 @@ function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => voi
     uniforms.uFrom.value = from;
     uniforms.uTo.value = to;
     uniforms.uMix.value = mix;
-    uniforms.uTime.value += Math.min(delta, 0.05);
+    // Phones run everything slower, so a small screen stays calm.
+    uniforms.uTime.value += Math.min(delta, 0.05) * (phone ? 0.65 : 1);
 
-    // Words must keep their letterforms, so they creep far less than the
-    // solid shapes. Phone shapes need bigger points than the dense name.
-    const isWord = (index: number) => ["top", "about", "contact"].includes(stops[index].id);
-    const rest = (index: number) => (stops[index].id === "top" ? 0.005 : isWord(index) ? 0.012 : 0.03);
+    // Fine detail has to hold still enough to read as a model.
+    const rest = (index: number) => (stops[index].id === "top" ? 0.005 : 0.012);
     uniforms.uRest.value = THREE.MathUtils.lerp(rest(from), rest(to), mix);
 
     // Point sizes are in drawing pixels, so they follow the live pixel ratio.
@@ -194,17 +201,18 @@ function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => voi
 
     uniforms.uTurn.value = state.clock.elapsedTime * 0.22 + scroll * 0.0012;
     const wormhole = stops.findIndex((stop) => stop.id === "wormhole");
-    const inTunnel = (index: number) => (index === wormhole ? 1 : 0);
-    uniforms.uTunnel.value = THREE.MathUtils.lerp(inTunnel(from), inTunnel(to), mix * mix * (3 - 2 * mix));
+    // The tunnel only ever runs on request, and ends when the visitor leaves.
+    const atWormhole = Math.abs(position.current - wormhole) < 0.6;
+    if (tunnelGoal.current && !atWormhole) {
+      tunnelGoal.current = false;
+      onTunnelEnd();
+    }
+    tunnelAmount.current = THREE.MathUtils.damp(tunnelAmount.current, tunnelGoal.current ? 1 : 0, 2.5, delta);
+    uniforms.uTunnel.value = tunnelAmount.current < 0.002 ? 0 : tunnelAmount.current;
     uniforms.uTunnelX.value = formLayout(stops[wormhole], size.width, size.height, phone).x;
     uniforms.uClear.value = phone ? 0 : uniforms.uTunnel.value;
     // The tunnel spreads the same particles over the whole screen.
-    uniforms.uBoost.value = 1 + uniforms.uTunnel.value * (phone ? 0.1 : 1.5);
-    uniforms.uTunnelScale.value = phone ? 0.5 : 1;
-    // A phone packs the same shape into far fewer pixels, so only the dense
-    // name keeps full strength; the rest would burn out to white.
-    const strength = (index: number) => (phone && stops[index].id !== "top" ? 0.58 : 1);
-    uniforms.uAlpha.value = THREE.MathUtils.lerp(strength(from), strength(to), mix);
+    uniforms.uBoost.value = 1 + uniforms.uTunnel.value * 1.5;
 
     const a = formLayout(stops[from], size.width, size.height, phone);
     const b = formLayout(stops[to], size.width, size.height, phone);
@@ -217,7 +225,7 @@ function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => voi
     const speed = (scroll - lastScroll.current) / Math.max(delta, 0.008) / 3000;
     lastScroll.current = scroll;
     velocity.current = THREE.MathUtils.damp(velocity.current, THREE.MathUtils.clamp(speed, -1, 1), 7, delta);
-    uniforms.uVelocity.value = velocity.current;
+    uniforms.uVelocity.value = phone ? 0 : velocity.current;
 
     burst.current = THREE.MathUtils.damp(burst.current, 0, 2.6, delta);
     uniforms.uBurst.value = burst.current;
@@ -245,7 +253,7 @@ function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => voi
       />
       {ready && (
         <group ref={points}>
-          <points geometry={glowGeometry} material={glow} frustumCulled={false} />
+          {!phone && <points geometry={glowGeometry} material={glow} frustumCulled={false} />}
           <points geometry={geometry} material={material} frustumCulled={false} />
         </group>
       )}
@@ -253,16 +261,17 @@ function Form({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => voi
   );
 }
 
-export default function GalleryCanvas({ tier, onFallback, onReady }: { tier: Tier; onFallback: () => void; onReady: () => void }) {
+export default function GalleryCanvas(props: FormProps) {
+  const { tier } = props;
   return (
     <Canvas
       camera={{ fov: CAMERA_FOV, position: [0, 0, CAMERA_DISTANCE], near: 0.1, far: 60 }}
-      dpr={tier === "phone" ? [1, 2] : [1, 1.5]}
+      dpr={tier === "phone" ? [1, 1.75] : [1, 1.5]}
       gl={{ antialias: false, powerPreference: "high-performance" }}
       style={{ pointerEvents: "none" }}
     >
       <color attach="background" args={[GROUND]} />
-      <Form tier={tier} onFallback={onFallback} onReady={onReady} />
+      <Form {...props} />
     </Canvas>
   );
 }

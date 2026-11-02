@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import { Room } from "@/components/room";
+import { WormholeButton } from "@/components/wormhole-button";
 import { projects } from "@/lib/content";
 
 export function ProjectsSection() {
@@ -45,6 +46,7 @@ export function ProjectsSection() {
               </a>
             ))}
           </div>
+          {project.key === "wormhole" && <WormholeButton />}
         </Room>
       ))}
     </div>

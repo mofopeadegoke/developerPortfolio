@@ -30,13 +30,15 @@ export const CAMERA_FOV = 35;
 export function formLayout(stop: Stop, width: number, height: number, phone: boolean) {
   const visibleHeight = 2 * Math.tan((CAMERA_FOV / 2) * (Math.PI / 180)) * CAMERA_DISTANCE;
   const visibleWidth = visibleHeight * (width / height);
-  if (phone) return { x: 0, y: visibleHeight * 0.24, scale: visibleWidth * (stop.id === "top" ? 0.42 : 0.38) };
+  // The train and toolbox reach past the usual 2 units, so they sit smaller.
+  const fit = stop.id === "experience" || stop.id === "skills" ? 0.8 : 1;
+  if (phone) return { x: 0, y: visibleHeight * 0.24, scale: visibleWidth * (stop.id === "top" ? 0.42 : 0.38) * fit };
   if (stop.id === "top") return { x: 0, y: visibleHeight * 0.2, scale: Math.min(visibleWidth * 0.44, visibleHeight * 0.72) };
   const gutter = Math.max(16, Math.min(56, width * 0.04));
   const textEdge = stop.width * 16 + gutter;
   const free = visibleWidth * (1 - Math.min(0.62, textEdge / width));
   const x = ((visibleWidth - free) / 2) * (stop.label === "left" ? 1 : -1);
-  return { x, y: 0, scale: Math.min(free * 0.4, visibleHeight * 0.34) };
+  return { x, y: 0, scale: Math.min(free * 0.4, visibleHeight * 0.34) * fit };
 }
 
 /** Progress through the shapes, in stop units, from page scroll. */

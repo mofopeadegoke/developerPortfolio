@@ -10,7 +10,9 @@ const GalleryCanvas = dynamic(() => import("@/components/gallery/gallery-canvas"
 
 type View = "gallery" | "list";
 
-const GalleryContext = createContext<{ view: View; toggleView: () => void }>({ view: "gallery", toggleView: () => {} });
+type GalleryState = { view: View; toggleView: () => void; canTunnel: boolean; tunnel: boolean; setTunnel: (on: boolean) => void };
+
+const GalleryContext = createContext<GalleryState>({ view: "gallery", toggleView: () => {}, canTunnel: false, tunnel: false, setTunnel: () => {} });
 
 export const useGalleryView = () => useContext(GalleryContext);
 
@@ -18,6 +20,18 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
   const [view, setView] = useState<View>("gallery");
   const [tier, setTier] = useState<Tier | null>(null);
   const [ready, setReady] = useState(false);
+  const [tunnel, setTunnel] = useState(false);
+
+  useEffect(() => {
+    if (!tunnel) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setTunnel(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [tunnel]);
+
+  const endTunnel = useCallback(() => setTunnel(false), []);
 
   useEffect(() => {
     const detected = detectTier();
@@ -50,13 +64,14 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
     setReady(true);
   }, []);
 
-  const value = useMemo(() => ({ view, toggleView }), [view, toggleView]);
+  const canTunnel = view === "gallery" && tier === "full";
+  const value = useMemo(() => ({ view, toggleView, canTunnel, tunnel, setTunnel }), [view, toggleView, canTunnel, tunnel]);
   const showCanvas = view === "gallery" && tier !== null && tier !== "still";
 
   return (
     <GalleryContext.Provider value={value}>
       <div aria-hidden="true" className="gallery-stage" data-ready={ready || undefined}>
-        {showCanvas && <GalleryCanvas tier={tier} onFallback={fallBack} onReady={markReady} />}
+        {showCanvas && <GalleryCanvas tier={tier} tunnel={tunnel} onTunnelEnd={endTunnel} onFallback={fallBack} onReady={markReady} />}
       </div>
       {children}
     </GalleryContext.Provider>

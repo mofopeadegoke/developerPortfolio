@@ -9,8 +9,8 @@ import { involuteGear } from "@/lib/gear";
 import { stops } from "@/lib/gallery";
 
 // Every shape the form takes is real geometry, and where possible real data:
-// the experience slabs are as long as each job, the skills columns as tall as
-// each group, the gears are true involute profiles that really mesh.
+// each train carriage is as long as the job it stands for, the toolbox holds one
+// tool per skill group, the gears are true involute profiles.
 //
 // A shape is made of parts. Each part owns a share of the particles and a group
 // number, which tells the shader how that part behaves: which embers rise, which
@@ -47,8 +47,8 @@ const box = (w: number, h: number, d: number, x = 0, y = 0, z = 0, turn = 0) => 
   return part;
 };
 
-function word(font: Font, text: string, size: number, y = 0) {
-  const part = new TextGeometry(text, { font, size, depth: 0.07, curveSegments: 8, bevelEnabled: true, bevelSize: 0.012, bevelThickness: 0.02, bevelSegments: 1 });
+function word(font: Font, text: string, size: number, y = 0, depth = 0.07) {
+  const part = new TextGeometry(text, { font, size, depth, curveSegments: 8, bevelEnabled: true, bevelSize: 0.012, bevelThickness: 0.02, bevelSegments: 1 });
   part.computeBoundingBox();
   const bounds = part.boundingBox!;
   part.translate(-(bounds.max.x + bounds.min.x) / 2, y, 0);
@@ -72,60 +72,151 @@ function monthsOf(job: { start: string; end: string }) {
   return Math.max(1, (end - Date.parse(`1 ${job.start}`)) / 2.63e9);
 }
 
+/** One carriage per job, newest behind the engine, each as long as the role. */
+function layoutTrain() {
+  const months = experience.map(monthsOf);
+  const total = months.reduce((sum, value) => sum + value, 0);
+  const engine = 0.5;
+  const gap = 0.035;
+  const base = 0.14;
+  const spare = 2 - engine - (gap + base) * months.length;
+  let right = 1 - engine - gap;
+  const carriages = months.map((value) => {
+    const length = base + (spare * value) / total;
+    const carriage = { x: right - length / 2, length };
+    right -= length + gap;
+    return carriage;
+  });
+  const wheels = [0.88, 0.62, ...carriages.flatMap(({ x, length }) => [x + length / 2 - 0.055, x - length / 2 + 0.055])];
+  return { carriages, wheels, wheelY: -0.17, chimney: [0.86, 0.32] as const };
+}
+
+export const TRAIN = layoutTrain();
+
+function wheel(x: number) {
+  const parts: THREE.BufferGeometry[] = [new THREE.TorusGeometry(0.055, 0.012, 8, 24)];
+  for (const angle of [0, Math.PI / 3, (2 * Math.PI) / 3]) {
+    const spoke = box(0.11, 0.012, 0.012);
+    spoke.rotateZ(angle);
+    parts.push(spoke);
+  }
+  const built = combine(parts);
+  built.translate(x, TRAIN.wheelY, 0.09);
+  return built;
+}
+
+/** Experience: a steam train chugging along, sleepers rushing past beneath it. */
 function experienceParts(): Part[] {
-  const slabs = experience.map(monthsOf);
-  return [{ share: 1, group: 0, geometry: normalise(combine(slabs.map((months, i) => box(0.5 + months * 0.34, 0.3, 0.9, 0, (slabs.length - 1 - i) * 0.52, 0, i * 0.45)))) }];
-}
-
-/** Uncooked: a resume whose untrue lines burn away while the true ones hold. */
-function uncookedParts(): Part[] {
-  const lines = [
-    { y: 0.62, width: 1.05, burns: false },
-    { y: 0.36, width: 0.8, burns: false },
-    { y: 0.1, width: 1.05, burns: true },
-    { y: -0.16, width: 0.9, burns: false },
-    { y: -0.42, width: 1.05, burns: true },
-    { y: -0.68, width: 0.62, burns: false },
-  ];
-  const page = new THREE.Shape();
-  page.moveTo(-0.72, -1).lineTo(0.42, -1).lineTo(0.72, -0.7).lineTo(0.72, 1).lineTo(-0.72, 1).closePath();
-  for (const line of lines) {
-    const slot = new THREE.Path();
-    slot.moveTo(-0.53, line.y).lineTo(-0.53 + line.width, line.y).lineTo(-0.53 + line.width, line.y + 0.11).lineTo(-0.53, line.y + 0.11).closePath();
-    page.holes.push(slot);
-  }
-  const bars = (burns: boolean) => combine(lines.filter((line) => line.burns === burns).map((line) => box(line.width, 0.1, 0.05, -0.53 + line.width / 2, line.y + 0.055)));
+  const boiler = new THREE.CylinderGeometry(0.1, 0.1, 0.36, 24);
+  boiler.rotateZ(Math.PI / 2);
+  boiler.translate(0.8, 0, 0);
+  const chimney = new THREE.CylinderGeometry(0.05, 0.035, 0.16, 16);
+  chimney.translate(TRAIN.chimney[0], TRAIN.chimney[1] - 0.14, 0);
+  const engine = [boiler, chimney, box(0.2, 0.3, 0.2, 0.6, 0.05, 0), box(0.26, 0.03, 0.26, 0.6, 0.215, 0)];
+  const carriages = TRAIN.carriages.map(({ x, length }) => {
+    const side = new THREE.Shape();
+    side.moveTo(-length / 2, -0.1).lineTo(length / 2, -0.1).lineTo(length / 2, 0.12).lineTo(-length / 2, 0.12).closePath();
+    const windows = Math.max(1, Math.floor(length / 0.15));
+    for (let i = 0; i < windows; i++) {
+      const centre = -length / 2 + (length * (i + 0.5)) / windows;
+      const pane = new THREE.Path();
+      pane.moveTo(centre - 0.04, 0.0).lineTo(centre + 0.04, 0.0).lineTo(centre + 0.04, 0.08).lineTo(centre - 0.04, 0.08).closePath();
+      side.holes.push(pane);
+    }
+    const body = extrude(side, 0.16);
+    body.translate(x, 0, -0.08);
+    return body;
+  });
+  const sleepers: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < 18; i++) sleepers.push(box(0.05, 0.015, 0.3, -1.15 + i * 0.1353, -0.25, 0));
   return [
-    { share: 0.56, group: 0, geometry: extrude(page, 0.05) },
-    { share: 0.14, group: 2, shade: 0.55, geometry: bars(false) },
-    { share: 0.3, group: 1, shade: 1, geometry: bars(true) },
-  ];
-}
-
-/** Smart Bookmarks: a storm of links is drawn in and tightens into one ribbon. */
-function bookmarkParts(): Part[] {
-  const ribbon = new THREE.BoxGeometry(1.0, 2, 0.06, 32, 64, 1);
-  const position = ribbon.attributes.position;
-  for (let i = 0; i < position.count; i++) {
-    const x = position.getX(i);
-    const bottom = -1 + (1 - Math.abs(x) / 0.5) * 0.46;
-    const y = bottom + ((1 - bottom) * (position.getY(i) + 1)) / 2;
-    position.setY(i, y);
-    position.setZ(i, position.getZ(i) + Math.sin(y * 2.2) * 0.2 + x * x * 0.3);
-  }
-  return [
-    { share: 0.55, group: 0, geometry: clean(ribbon) },
+    { share: 0.28, group: 0, geometry: combine(engine) },
+    { share: 0.41, group: 0, geometry: combine(carriages) },
+    ...TRAIN.wheels.map((x, i) => ({ share: 0.006, group: 10 + i, shade: 0.6, geometry: wheel(x) })),
+    { share: 0.05, group: 2, shade: 0.5, geometry: combine([box(2.3, 0.012, 0.02, 0, -0.235, 0.09), box(2.3, 0.012, 0.02, 0, -0.235, -0.09)]) },
+    { share: 0.07, group: 3, shade: 0.45, geometry: combine(sleepers) },
     {
-      share: 0.45,
-      group: 1,
-      shade: 0.8,
-      point: ({ position: out, normal }) => {
-        const angle = Math.random() * Math.PI * 2;
-        const radius = 0.5 + Math.random() * 0.65;
-        out.set(Math.cos(angle) * radius, (Math.random() - 0.5) * 1.8, Math.sin(angle) * radius * 0.6);
+      share: 0.116,
+      group: 4,
+      shade: 0.6,
+      point: ({ position: at, normal }) => {
+        at.set(TRAIN.chimney[0], TRAIN.chimney[1], 0);
         normal.set(0, 0, 1);
       },
     },
+  ];
+}
+
+/** Uncooked: a frying pan tosses a resume like a pancake. It lands uncooked. */
+export const PAN = { x: -0.32, y: -0.62, tilt: 0.45 };
+
+function uncookedParts(): Part[] {
+  const profile = [[0, 0], [0.66, 0], [0.74, 0.03], [0.78, 0.2], [0.8, 0.21]].map(([x, y]) => new THREE.Vector2(x, y));
+  const bowl = new THREE.LatheGeometry(profile, 56);
+  const pan = combine([bowl, box(0.62, 0.05, 0.1, 1.09, 0.17, 0)]);
+  pan.rotateX(PAN.tilt);
+  pan.translate(PAN.x, PAN.y, 0);
+
+  const page = new THREE.Shape();
+  page.moveTo(-0.46, -0.58).lineTo(0.28, -0.58).lineTo(0.46, -0.4).lineTo(0.46, 0.58).lineTo(-0.46, 0.58).closePath();
+  [[0.36, 0.7], [0.16, 0.5], [-0.04, 0.7], [-0.24, 0.6], [-0.44, 0.38]].forEach(([y, width]) => {
+    const slot = new THREE.Path();
+    slot.moveTo(-0.34, y).lineTo(-0.34 + width, y).lineTo(-0.34 + width, y + 0.09).lineTo(-0.34, y + 0.09).closePath();
+    page.holes.push(slot);
+  });
+  const resume = extrude(page, 0.03);
+  resume.translate(0, 0, -0.015);
+
+  return [
+    { share: 0.5, group: 0, geometry: pan },
+    { share: 0.4, group: 1, geometry: resume },
+    {
+      share: 0.1,
+      group: 2,
+      shade: 1,
+      point: ({ position: at, normal }) => {
+        const angle = Math.random() * Math.PI * 2;
+        at.set(PAN.x + Math.cos(angle) * 0.55, PAN.y + 0.15, Math.sin(angle) * 0.4);
+        normal.set(0, 1, 0);
+      },
+    },
+  ];
+}
+
+/** Smart Bookmarks: a paper plane lands in a book, which snaps shut on it. */
+function bookmarkParts(): Part[] {
+  const half = (sign: number) => box(1, 1.4, 0.05, sign * 0.5, 0, 0);
+  const lines = (sign: number) => {
+    const rows: THREE.BufferGeometry[] = [];
+    for (let i = 0; i < 7; i++) rows.push(box(0.68, 0.05, 0.02, sign * 0.5, 0.48 - i * 0.16, 0.04));
+    return combine(rows);
+  };
+  const dart = new THREE.BufferGeometry();
+  const [nose, inner, keel] = [[0.42, 0, 0], [-0.3, 0, 0], [-0.4, -0.13, 0]];
+  dart.setAttribute(
+    "position",
+    new THREE.BufferAttribute(new Float32Array([...nose, -0.42, 0.05, 0.32, ...inner, ...nose, ...inner, -0.42, 0.05, -0.32, ...nose, ...inner, ...keel]), 3),
+  );
+  dart.computeVertexNormals();
+  dart.rotateX(0.7);
+
+  const tag = () => {
+    const label = new THREE.Shape();
+    label.moveTo(-0.15, -0.08).lineTo(0.08, -0.08).lineTo(0.16, 0).lineTo(0.08, 0.08).lineTo(-0.15, 0.08).closePath();
+    const hole = new THREE.Path();
+    hole.absarc(0.07, 0, 0.022, 0, Math.PI * 2, true);
+    label.holes.push(hole);
+    return extrude(label, 0.02);
+  };
+
+  return [
+    { share: 0.24, group: 0, geometry: half(-1) },
+    { share: 0.08, group: 0, shade: 0.85, geometry: lines(-1) },
+    { share: 0.24, group: 1, geometry: half(1) },
+    { share: 0.08, group: 1, shade: 0.85, geometry: lines(1) },
+    { share: 0.12, group: 2, shade: 0.9, geometry: dart },
+    { share: 0.06, group: 3, shade: 0.9, geometry: box(0.2, 0.52, 0.02, 0, -0.96, 0.05) },
+    ...[4, 5, 6, 7, 8].map((group) => ({ share: 0.036, group, geometry: tag() })),
   ];
 }
 
@@ -144,43 +235,37 @@ function omniplexusParts(): Part[] {
   return parts;
 }
 
-/** The script Inscribe's pen writes. The shader traces this same curve. */
-export function inkPoint(u: number, out = new THREE.Vector2()) {
-  const loops = u * Math.PI * 2 * 7;
-  return out.set(-1 + 1.5 * u - 0.1 * Math.sin(loops), -0.5 + 0.2 * Math.cos(loops) * (0.72 + 0.28 * Math.sin(u * Math.PI * 4)));
-}
+/** Inscribe: a rubber stamp hammers the real install count onto a page. */
+export const STAMP = { tilt: 0.8, y: -0.4 };
 
-/** Inscribe: a pen writes a glowing line of script in the air, stroke by stroke. */
-function inscribeParts(): Part[] {
-  const nib = new THREE.Shape();
-  nib.moveTo(0, 0);
-  nib.bezierCurveTo(0.08, 0.28, 0.37, 0.54, 0.31, 0.86);
-  nib.lineTo(0.21, 1.24);
-  nib.lineTo(-0.21, 1.24);
-  nib.lineTo(-0.31, 0.86);
-  nib.bezierCurveTo(-0.37, 0.54, -0.08, 0.28, 0, 0);
-  const eye = new THREE.Path();
-  eye.absarc(0, 0.78, 0.07, 0, Math.PI * 2, true);
-  nib.holes.push(eye);
-  const slit = new THREE.Path();
-  slit.moveTo(-0.018, 0.16).lineTo(0.018, 0.16).lineTo(0.018, 0.72).lineTo(-0.018, 0.72).closePath();
-  nib.holes.push(slit);
-  const pen = extrude(nib, 0.05);
-  pen.scale(0.7, 0.7, 0.7);
-  pen.rotateZ(-0.32);
-  const start = inkPoint(0);
-  pen.translate(start.x, start.y, 0);
-
-  const ink = new THREE.Vector2();
+function inscribeParts(font: Font): Part[] {
+  const place = (geometry: THREE.BufferGeometry) => {
+    const flat = clean(geometry);
+    flat.rotateX(STAMP.tilt);
+    flat.translate(0, STAMP.y, 0);
+    return flat;
+  };
+  const neck = new THREE.CylinderGeometry(0.1, 0.15, 0.34, 28);
+  neck.translate(0, 0.31, 0);
+  const knob = new THREE.SphereGeometry(0.24, 28, 20);
+  knob.scale(1, 0.8, 1);
+  knob.translate(0, 0.6, 0);
+  const printed = word(font, "4,000+", 0.32, 0, 0.012);
+  printed.rotateX(-Math.PI / 2);
+  printed.translate(0, 0.03, 0.14);
+  const ring = new THREE.Vector3();
   return [
-    { share: 0.42, group: 0, geometry: pen },
+    { share: 0.28, group: 0, geometry: place(box(2, 0.02, 1.2)) },
+    { share: 0.3, group: 1, shade: 0.95, geometry: place(printed) },
+    { share: 0.34, group: 2, geometry: place(combine([box(1.5, 0.14, 0.66, 0, 0.09, 0), neck, knob])) },
     {
-      share: 0.58,
-      group: (_, index) => 1 + (index % 1000),
-      shade: 0.62,
-      point: ({ position: out, normal }, index) => {
-        inkPoint((index % 1000) / 999, ink);
-        out.set(ink.x + (Math.random() - 0.5) * 0.024, ink.y + (Math.random() - 0.5) * 0.024, (Math.random() - 0.5) * 0.02);
+      share: 0.08,
+      group: 3,
+      shade: 1,
+      point: ({ position: at, normal }) => {
+        const angle = Math.random() * Math.PI * 2;
+        ring.set(Math.cos(angle), 0.02, Math.sin(angle) * 0.6).applyAxisAngle(new THREE.Vector3(1, 0, 0), STAMP.tilt);
+        at.set(ring.x, ring.y + STAMP.y, ring.z);
         normal.set(0, 0, 1);
       },
     },
@@ -232,26 +317,79 @@ function gearParts(): Part[] {
   });
 }
 
-/** Wormhole: sampled as rings, but the shader opens them around the viewer. */
+/** Wormhole: calm breathing rings, until a visitor asks to go through. */
 function wormholeParts(): Part[] {
-  const rings: THREE.BufferGeometry[] = [];
-  for (let i = 0; i < 9; i++) {
+  return Array.from({ length: 9 }, (_, i) => {
     const ring = new THREE.TorusGeometry(1 - i * 0.09, 0.03, 10, 96);
     ring.translate(0, 0, 0.7 - i * 0.2);
-    rings.push(ring);
-  }
-  return [{ share: 1, group: 0, geometry: combine(rings) }];
+    return { share: 1 / 9, group: i, geometry: ring };
+  });
 }
 
+/** One tool for each skill group, drawn upright around its own centre. */
+const TOOLS: (() => THREE.BufferGeometry)[] = [
+  // Hammer
+  () => combine([box(0.07, 0.62, 0.07), box(0.32, 0.13, 0.13, 0.04, 0.28, 0)]),
+  // Screwdriver
+  () => {
+    const grip = new THREE.CylinderGeometry(0.055, 0.045, 0.28, 16);
+    grip.translate(0, -0.17, 0);
+    const shaft = new THREE.CylinderGeometry(0.016, 0.016, 0.34, 10);
+    shaft.translate(0, 0.14, 0);
+    return combine([grip, shaft, box(0.05, 0.05, 0.012, 0, 0.32, 0)]);
+  },
+  // Wrench
+  () => {
+    const head = new THREE.Shape();
+    head.absarc(0, 0.27, 0.12, -0.75 + Math.PI / 2 + 1.5, Math.PI / 2 - 0.75 + 0.0 + Math.PI * 2 - 1.5 + 1.5, false);
+    head.lineTo(0, 0.25);
+    head.closePath();
+    const built = extrude(head, 0.05);
+    return combine([built, box(0.09, 0.5, 0.05, 0, -0.08, 0.025)]);
+  },
+  // Pliers
+  () => {
+    const arm = (lean: number) => {
+      const part = box(0.055, 0.66, 0.04);
+      part.rotateZ(lean);
+      return part;
+    };
+    const pivot = new THREE.CylinderGeometry(0.05, 0.05, 0.05, 16);
+    pivot.rotateX(Math.PI / 2);
+    pivot.translate(0, 0.1, 0);
+    const a = arm(0.2);
+    const b = arm(-0.2);
+    a.translate(0, 0.1, 0);
+    b.translate(0, 0.1, 0);
+    return combine([a, b, pivot]);
+  },
+  // Paintbrush
+  () => combine([box(0.05, 0.4, 0.05, 0, -0.1, 0), box(0.14, 0.09, 0.06, 0, 0.13, 0), box(0.17, 0.2, 0.05, 0, 0.27, 0)]),
+  // Ruler
+  () => {
+    const ticks: THREE.BufferGeometry[] = [box(0.13, 0.66, 0.02)];
+    for (let i = 0; i < 9; i++) ticks.push(box(i % 2 ? 0.05 : 0.08, 0.012, 0.03, -0.03, -0.28 + i * 0.07, 0.01));
+    return combine(ticks);
+  },
+];
+
+export const TOOL_COUNT = Math.max(TOOLS.length, skillGroups.length);
+
+/** Skills: a toolbox bursts open and its tools fly out to orbit it. */
 function skillsParts(): Part[] {
-  const columns = skillGroups.map((group, i) => {
-    const angle = (i / skillGroups.length) * Math.PI * 2;
-    const height = group.skills.length * 0.28;
-    const column = new THREE.CylinderGeometry(0.24, 0.24, height, 32);
-    column.translate(Math.cos(angle) * 0.92, height / 2, Math.sin(angle) * 0.92);
-    return column;
-  });
-  return [{ share: 1, group: 0, geometry: normalise(combine(columns)) }];
+  const body = box(1.5, 0.52, 0.72, 0, -0.62, 0);
+  const handle = new THREE.TorusGeometry(0.17, 0.022, 8, 28, Math.PI);
+  handle.translate(0, -0.31, 0);
+  const lid = combine([box(1.5, 0.08, 0.72, 0, -0.33, 0), handle]);
+  return [
+    { share: 0.3, group: 0, geometry: body },
+    { share: 0.16, group: 1, geometry: lid },
+    ...TOOLS.map((tool, i) => {
+      const built = clean(tool());
+      built.translate(-0.55 + 0.22 * i, -0.45, 0);
+      return { share: 0.09, group: 2 + i, geometry: built };
+    }),
+  ];
 }
 
 const LIGHT = new THREE.Vector3(0.35, 0.65, 0.68).normalize();
@@ -308,7 +446,7 @@ export async function buildShapes(side: number, stacked: boolean, onFirst: (data
     uncooked: uncookedParts,
     "smart-bookmarks": bookmarkParts,
     omniplexus: omniplexusParts,
-    inscribe: inscribeParts,
+    inscribe: () => inscribeParts(font),
     gear: gearParts,
     wormhole: wormholeParts,
     skills: skillsParts,

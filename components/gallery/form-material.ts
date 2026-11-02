@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { GEARS } from "@/components/gallery/form-shapes";
+import { GEARS, PAN, STAMP, TRAIN } from "@/components/gallery/form-shapes";
 
 // The flow loop is adapted from github.com/collidingScopes/liquid-logo (MIT, see
 // THIRD_PARTY_NOTICES.md): there it colours a 2D logo; here it carries particles
@@ -16,6 +16,11 @@ const gearBranches = GEARS.centres
       }`,
   )
   .join("\n      ");
+
+const wheelCount = TRAIN.wheels.length;
+const wheelList = TRAIN.wheels.map(glsl).join(", ");
+const stampUp = `vec3(0.0, ${glsl(Math.cos(STAMP.tilt))}, ${glsl(Math.sin(STAMP.tilt))})`;
+const panRest = glsl(-Math.PI / 2 + PAN.tilt);
 
 const vertexShader = /* glsl */ `
   uniform highp sampler2DArray uShapes;
@@ -40,32 +45,80 @@ const vertexShader = /* glsl */ `
     return sin(v);
   }
 
-  // Must match inkPoint in form-shapes.ts.
-  vec2 inkPoint(float u) {
-    float loops = u * 6.28318 * 7.0;
-    return vec2(-1.0 + 1.5 * u - 0.1 * sin(loops), -0.5 + 0.2 * cos(loops) * (0.72 + 0.28 * sin(u * 12.56636)));
-  }
+  const float WHEEL_X[${wheelCount}] = float[${wheelCount}](${wheelList});
 
-  // Each project's own behaviour. Returns where a particle is right now.
+  // Each model's own behaviour. Returns where a particle is right now.
   vec3 behave(vec3 p, float shape, float group, inout float heat, inout float fade) {
-    // Uncooked: the untrue lines shed embers that rise and die.
-    if (shape > 1.5 && shape < 2.5 && group > 0.5 && group < 1.5) {
-      float life = fract(uTime * 0.17 + aSeed * 13.0);
-      p.y += life * life * 1.8;
-      p.x += sin(life * 9.0 + aSeed * 40.0) * 0.16 * life;
-      p.z += life * 0.3 * (aSeed - 0.5);
-      heat = max(heat, 0.75 - life * 0.45);
-      fade *= 1.0 - smoothstep(0.45, 1.0, life);
+    // Experience: a train chugs along with the sleepers rushing past beneath it.
+    if (shape > 0.5 && shape < 1.5) {
+      if (group < 1.5) {
+        p.y += sin(uTime * 7.0 + p.x * 5.0) * 0.006;
+      } else if (group > 2.5 && group < 3.5) {
+        p.x = mod(p.x + 1.15 - uTime * 0.45, 2.3) - 1.15;
+      } else if (group > 3.5 && group < 4.5) {
+        float life = fract(uTime * 0.2 + aSeed * 11.0);
+        vec3 drift = vec3(sin(aSeed * 91.0), cos(aSeed * 53.0), sin(aSeed * 37.0));
+        p += vec3(-life * 0.95, life * 0.5 + life * life * 0.15, 0.0) + drift * life * 0.17;
+        fade *= (1.0 - life) * smoothstep(0.0, 0.06, life);
+      } else if (group > 9.5) {
+        vec2 c = vec2(WHEEL_X[int(group) - 10], ${glsl(TRAIN.wheelY)});
+        p.xy = c + rot(p.xy - c, -uTime * 3.0);
+      }
       return p;
     }
-    // Smart Bookmarks: loose links spiral in and vanish into the ribbon.
-    if (shape > 2.5 && shape < 3.5 && group > 0.5) {
-      float life = fract(uTime * 0.1 + aSeed * 17.0);
-      float radius = mix(1.12, 0.12, life * life);
-      float angle = aSeed * 400.0 + uTime * 0.45 + (1.0 - life) * 6.0;
-      p = vec3(cos(angle) * radius, p.y * (radius / 1.12 + 0.2), sin(angle) * radius * 0.65);
-      heat = max(heat, life * 0.8);
-      fade *= smoothstep(0.0, 0.2, life) * (1.0 - smoothstep(0.92, 1.0, life));
+    // Uncooked: the pan tosses the resume, which flips and lands uncooked.
+    if (shape > 1.5 && shape < 2.5) {
+      float T = fract(uTime * 0.15);
+      float flight = clamp(T / 0.62, 0.0, 1.0);
+      float landed = max(T - 0.62, 0.0);
+      float kick = sin(min(T / 0.07, 1.0) * 3.14159) * 0.1 - step(0.62, T) * exp(-landed * 22.0) * 0.07;
+      if (group < 0.5) {
+        p.y += kick;
+      } else if (group < 1.5) {
+        float angle = ${panRest} + 6.28318 * pow(flight, 2.4);
+        p.yz = rot(p.yz, angle);
+        p += vec3(${glsl(PAN.x)}, ${glsl(PAN.y)} + 0.2 + 4.0 * flight * (1.0 - flight) * 1.1, 0.0);
+      } else {
+        float spark = (T - 0.62) / 0.25;
+        if (spark < 0.0 || spark > 1.0) {
+          fade = 0.0;
+          return p;
+        }
+        vec2 outward = normalize(p.xz - vec2(${glsl(PAN.x)}, 0.0));
+        p += vec3(outward.x, 0.0, outward.y) * spark * 0.6 + vec3(0.0, spark * (1.0 - spark) * 1.5 * (0.4 + aSeed), 0.0);
+        fade *= 1.0 - spark;
+        heat = 1.0;
+      }
+      return p;
+    }
+    // Smart Bookmarks: a plane lands in a book, which snaps shut and shows its tags.
+    if (shape > 2.5 && shape < 3.5) {
+      float T = fract(uTime * 0.11);
+      float shut = smoothstep(0.4, 0.46, T) * (1.0 - smoothstep(0.86, 0.96, T));
+      float emerge = smoothstep(0.5, 0.62, T) * (1.0 - smoothstep(0.82, 0.9, T));
+      if (group < 1.5) {
+        float angle = group < 0.5 ? -0.3 : mix(0.3, 2.84, shut);
+        p.xz = rot(p.xz, angle);
+        p.x += shut * 0.47;
+      } else if (group < 2.5) {
+        float along = smoothstep(0.0, 0.42, T);
+        vec3 shrunk = p * mix(1.0, 0.45, along);
+        shrunk.xy = rot(shrunk.xy, -0.5);
+        p = mix(vec3(-1.4, 1.0, 0.5), vec3(0.0, 0.0, 0.15), along) + shrunk;
+        p.y += sin(along * 6.28318) * 0.2;
+        fade *= smoothstep(0.0, 0.04, T) * (1.0 - smoothstep(0.39, 0.43, T));
+      } else if (group < 3.5) {
+        p.y = mix(-0.62, p.y, emerge);
+        p.x += sin(p.y * 7.0 + uTime * 3.0) * 0.03 * emerge;
+        fade *= emerge;
+      } else {
+        float i = group - 4.0;
+        float angle = i * 1.257 + 0.6;
+        float reach = emerge * (0.95 + sin(uTime * 0.9 + i) * 0.1);
+        vec2 spun = rot(p.xy, uTime * 0.8 + i);
+        p = vec3(spun, p.z) + vec3(cos(angle) * reach * 1.15, sin(angle) * reach, 0.3);
+        fade *= emerge;
+      }
       return p;
     }
     // Omniplexus: tiles leave the module one by one and build the panel.
@@ -78,28 +131,58 @@ const vertexShader = /* glsl */ `
       heat = max(heat, (1.0 - abs(grown * 2.0 - 1.0)) * 0.9);
       return p;
     }
-    // Inscribe: the pen travels the line and the ink appears behind it.
+    // Inscribe: the stamp hovers, slams down and leaves the install count behind.
     if (shape > 4.5 && shape < 5.5) {
-      float head = fract(uTime * 0.075) * 1.3;
-      vec2 tip = inkPoint(min(head, 1.0));
+      float T = fract(uTime * 0.15);
+      float drop = clamp((T - 0.42) / 0.08, 0.0, 1.0);
+      float lifted = mix(mix(0.95 + sin(uTime * 2.0) * 0.04, 0.0, drop * drop), 0.95, smoothstep(0.6, 0.85, T));
+      float impact = step(0.5, T) * exp(-(T - 0.5) * 14.0);
       if (group < 0.5) {
-        p.xy += tip - inkPoint(0.0);
-        p.xy += vec2(0.0, 0.06 * smoothstep(1.0, 1.1, head));
-        return p;
+        p.y -= impact * 0.04;
+      } else if (group < 1.5) {
+        fade *= smoothstep(0.5, 0.51, T) * (1.0 - smoothstep(0.93, 1.0, T));
+        heat = max(heat, impact);
+      } else if (group < 2.5) {
+        p += ${stampUp} * lifted;
+      } else {
+        float wave = (T - 0.5) / 0.25;
+        if (wave < 0.0 || wave > 1.0) {
+          fade = 0.0;
+          return p;
+        }
+        vec3 centre = vec3(0.0, ${glsl(STAMP.y)}, 0.0);
+        p = centre + (p - centre) * mix(0.4, 1.5, wave);
+        fade *= 1.0 - wave;
+        heat = 1.0;
       }
-      float u = (group - 1.0) / 999.0;
-      if (u > head) {
-        p.xy = tip;
-        fade = 0.0;
-        return p;
-      }
-      heat = max(heat, exp(-(head - u) * 12.0));
-      fade *= 1.0 - smoothstep(1.2, 1.3, head);
       return p;
     }
     // Gear Library: three gears turn together at the ratio of their teeth.
     if (shape > 5.5 && shape < 6.5) {
       ${gearBranches}
+    }
+    // Wormhole: at rest the rings only breathe.
+    if (shape > 6.5 && shape < 7.5) {
+      p.xy *= 1.0 + sin(uTime * 0.7 - group * 0.6) * 0.05;
+      return p;
+    }
+    // Skills: the lid flies open and the tools circle the box.
+    if (shape > 7.5 && shape < 8.5 && group > 0.5) {
+      float T = fract(uTime * 0.08);
+      if (group < 1.5) {
+        float open = smoothstep(0.02, 0.14, T) * (1.0 - smoothstep(0.88, 0.98, T));
+        vec2 hinge = vec2(-0.37, -0.36);
+        p.yz = hinge + rot(p.yz - hinge, -open * 2.1);
+        return p;
+      }
+      float i = group - 2.0;
+      float away = smoothstep(0.05 + i * 0.03, 0.2 + i * 0.03, T) * (1.0 - smoothstep(0.82, 0.96, T));
+      vec3 home = vec3(-0.55 + 0.22 * i, -0.45, 0.0);
+      vec3 local = p - home;
+      float angle = i * 1.0472 + uTime * 0.35;
+      local.xy = rot(local.xy, away * (uTime * 0.5 + i)) * (1.0 + away * 0.35);
+      p = mix(home, vec3(cos(angle) * 0.98, 0.42 + sin(angle) * 0.16, sin(angle) * 0.5), away) + local;
+      return p;
     }
     return p;
   }
