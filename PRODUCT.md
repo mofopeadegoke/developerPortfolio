@@ -27,8 +27,8 @@ A recent software engineering graduate who owned frontend architecture for produ
 
 ## Brand Commitments
 
-- The involute gear is not carried into the experimental redesign, by the user's decision.
-- The visual materials under evaluation come from react-three-fiber, liquid-glass-js, shadergradient and liquid-logo.
+- The involute gear is no longer the site's identity. A gear appears only as the Gear Library project's own exhibit.
+- The visual materials come from react-three-fiber, shadergradient and liquid-logo. The look of liquid-glass-js is recreated inside the 3D scene rather than installed.
 
 ## Evidence on Hand
 
