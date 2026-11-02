@@ -331,7 +331,7 @@ export const achievements: Achievement[] = [
     year: "2023",
     href: "https://github.com/mofopeadegoke/TechSpace-Project-Organik",
   },
-  { result: "Top 1%", event: "Teknofest, Robotics", year: "2025" },
+  { result: "Top 0.1%", event: "Teknofest, Robotics", year: "2025" },
   { result: "Top 0.5%", event: "Teknofest, Tourism", year: "2025" },
   { result: "Top 1%", event: "Teknofest, AI in Aviation", year: "2026" },
   { result: "Top 10%", event: "MARK AI marketing agent (Python)", year: "2025" },
