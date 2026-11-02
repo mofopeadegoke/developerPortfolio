@@ -26,6 +26,16 @@ function Stroke({ d, delay = 0, accent = false }: { d: string; delay?: number; a
 }
 
 const drawings: Record<ProjectKey, React.ReactNode> = {
+  // A resume page with an untrue line struck out and the rest checked.
+  uncooked: (
+    <>
+      <Stroke d="M36 10 h88 v100 h-88 z" />
+      <Stroke d="M48 24 h40 M48 36 h64 M48 46 h56 M48 72 h64 M48 82 h44" delay={0.25} />
+      <Stroke d="M48 55 h60 v8 h-60 z" delay={0.45} />
+      <Stroke d="M42 59 h72" accent delay={0.7} />
+      <Stroke d="M98 94 l6 6 12 -14" accent delay={0.9} />
+    </>
+  ),
   // A saved page with its summary lines, a bookmark ribbon and tags.
   "smart-bookmarks": (
     <>

@@ -103,7 +103,7 @@ export const experience: Experience[] = [
   },
 ];
 
-export type ProjectKey = "smart-bookmarks" | "omniplexus" | "inscribe" | "gear" | "wormhole";
+export type ProjectKey = "uncooked" | "smart-bookmarks" | "omniplexus" | "inscribe" | "gear" | "wormhole";
 
 export type Project = {
   key: ProjectKey;
@@ -117,6 +117,24 @@ export type Project = {
 };
 
 export const projects: Project[] = [
+  {
+    key: "uncooked",
+    title: "Uncooked",
+    role: "Open-source AI plugin for Claude Code, Claude.ai and Gemini",
+    years: "2026",
+    result: "Tailors a resume to a job without adding anything untrue",
+    points: [
+      "Built resume-tailoring and application-tracking skills that reword, reorder and cut, but never add a fact the candidate hasn't confirmed.",
+      "Tested 20+ resume variants against OpenResume and Affinda, changing one thing at a time, and turned the findings into the plugin's rules.",
+      "Wrote an 11-case eval suite with regex checks and an LLM judge: on two job postings it scored 0.95–0.96, against 0.50 for plain Claude (Sonnet, 3 runs each).",
+      "Covered the scripts with 103 unit tests.",
+    ],
+    stack: ["Claude Code plugins", "LLM evals", "Python", "LaTeX"],
+    links: [
+      { label: "Project site", href: "https://uncooked-plugin.vercel.app/" },
+      { label: "Source on GitHub", href: "https://github.com/mofopeadegoke/uncooked" },
+    ],
+  },
   {
     key: "smart-bookmarks",
     title: "Smart Bookmarks",
@@ -249,6 +267,8 @@ export const skillGroups: SkillGroup[] = [
     name: "AI and systems",
     skills: [
       { name: "Claude API, structured outputs", usedIn: "Smart Bookmarks" },
+      { name: "Claude Code plugins", usedIn: "Uncooked" },
+      { name: "LLM evals", usedIn: "Uncooked" },
       { name: "AI agent development in Python", usedIn: "MARK AI" },
       { name: "Model Context Protocol (MCP)", usedIn: "Technolink" },
       { name: "AI-assisted development workflows" },
@@ -287,7 +307,7 @@ export const about = {
   paragraphs: [
     "I work across the whole stack but I'm happiest where interfaces meet hard engineering: a component library other developers can trust, or an undocumented C++ engine I had to learn by reading its source.",
     "I graduated in June 2026 with a B.Sc. in Software Engineering and have been shipping software since 2022, when I launched Inscribe.",
-    "Lately I've moved into full-stack and AI work: Smart Bookmarks runs on Next.js and PostgreSQL and uses Claude to summarise and tag what you save.",
+    "Lately I've moved into full-stack and AI work: Smart Bookmarks runs on Next.js and PostgreSQL and uses Claude to summarise and tag what you save, and Uncooked is an open-source plugin that tailors resumes without adding anything untrue, backed by its own evals.",
   ],
   education: {
     degree: "B.Sc. Software Engineering",
