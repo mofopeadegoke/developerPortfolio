@@ -1,18 +1,16 @@
 import type { AnchorHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-type Props = AnchorHTMLAttributes<HTMLAnchorElement> & {
-  variant?: "solid" | "outline";
-};
+type LinkButtonProps = AnchorHTMLAttributes<HTMLAnchorElement> & { variant?: "solid" | "outline" };
 
-export function LinkButton({ variant = "solid", className, ...props }: Props) {
+export function LinkButton({ variant = "solid", className, ...props }: LinkButtonProps) {
   return (
     <a
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-[3px] px-5 py-2.5 text-[0.95rem] font-medium transition-[background-color,color,transform] duration-200 active:translate-y-px",
+        "inline-flex items-center justify-center gap-2 border px-5 py-3 font-medium transition-colors duration-200",
         variant === "solid"
-          ? "bg-redline text-redline-ink hover:bg-ink hover:text-paper"
-          : "border border-ink text-ink hover:bg-ink hover:text-paper",
+          ? "border-ink bg-ink text-label hover:border-ultramarine hover:bg-ultramarine"
+          : "border-ink bg-transparent text-ink hover:bg-ink hover:text-label",
         className,
       )}
       {...props}

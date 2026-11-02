@@ -1,5 +1,6 @@
+import { GalleryProvider } from "@/components/gallery/gallery-stage";
 import { Navigation } from "@/components/navigation";
-import { HeroSection } from "@/components/hero-section";
+import { EntranceSection } from "@/components/entrance-section";
 import { ExperienceSection } from "@/components/experience-section";
 import { ProjectsSection } from "@/components/projects-section";
 import { SkillsSection } from "@/components/skills-section";
@@ -9,16 +10,13 @@ import { Footer } from "@/components/footer";
 
 export default function Portfolio() {
   return (
-    <>
-      <a
-        href="#experience"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-paper focus:px-4 focus:py-2"
-      >
+    <GalleryProvider>
+      <a href="#experience" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-label focus:px-4 focus:py-2">
         Skip to content
       </a>
       <Navigation />
       <main>
-        <HeroSection />
+        <EntranceSection />
         <ExperienceSection />
         <ProjectsSection />
         <SkillsSection />
@@ -26,6 +24,6 @@ export default function Portfolio() {
         <ContactSection />
       </main>
       <Footer />
-    </>
+    </GalleryProvider>
   );
 }

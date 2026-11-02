@@ -1,20 +1,23 @@
 import type React from "react";
 import type { Metadata, Viewport } from "next";
-import { Barlow, Barlow_Condensed } from "next/font/google";
+import { Archivo, Schibsted_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
-const barlow = Barlow({
+const archivo = Archivo({
+  subsets: ["latin", "latin-ext"],
+  weight: "variable",
+  axes: ["wdth"],
+  variable: "--font-archivo",
+});
+const schibsted = Schibsted_Grotesk({
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600"],
-  variable: "--font-barlow",
+  variable: "--font-schibsted",
 });
-const barlowCondensed = Barlow_Condensed({
-  subsets: ["latin", "latin-ext"],
-  weight: ["500", "600"],
-  variable: "--font-barlow-condensed",
-});
+
+// Applied before first paint so list-view visitors never see the gallery flash.
+const viewScript = `try{var v=new URLSearchParams(location.search).get("view")||localStorage.getItem("gallery-view");if(v==="list")document.documentElement.dataset.view="list"}catch(e){}`;
 
 const description =
   "Software Engineer in Famagusta, Cyprus. Frontend architecture in React, React Native and TypeScript, full-stack apps with Next.js, PostgreSQL and the Claude API, and C++ systems work. Open to relocation across Europe or remote.";
@@ -46,19 +49,15 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ecede8" },
-    { media: "(prefers-color-scheme: dark)", color: "#1e2329" },
-  ],
+  themeColor: "#1b2fd0",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${barlow.variable} ${barlowCondensed.variable} font-sans antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-        </ThemeProvider>
+      <body className={`${archivo.variable} ${schibsted.variable} font-sans antialiased`}>
+        <script dangerouslySetInnerHTML={{ __html: viewScript }} />
+        {children}
         <Analytics />
       </body>
     </html>

@@ -195,7 +195,7 @@ export const projects: Project[] = [
     result: "3D gear models from 5 parameters, geometry written from scratch",
     points: [
       "Generates parametric 3D gear models from 5 configurable parameters.",
-      "Implements the computational geometry from first principles rather than wrapping an existing package. The gear at the top of this page uses the same involute maths.",
+      "Implements the computational geometry from first principles rather than wrapping an existing package. The gear in this case uses the same involute maths.",
     ],
     stack: ["C++", "Computational geometry", "STL"],
     links: [{ label: "Source on GitHub", href: "https://github.com/mofopeadegoke/gearGeneration" }],

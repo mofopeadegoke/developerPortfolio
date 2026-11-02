@@ -1,45 +1,28 @@
 @import 'tailwindcss';
 
-@custom-variant dark (&:is(.dark *));
-
-/* Drafting-sheet palette. Light = vellum sheet, dark = graphite slate sheet. */
 :root {
-  --paper: #ecede8;
-  --paper-raised: #f4f5f1;
-  --ink: #23262b;
-  --pencil: #5e6269;
-  --rule: #c9cbc4;
-  --construct: #9bcbe0;
-  --redline: #c23a2e;
-  --redline-ink: #ffffff;
-  --grid-opacity: 22%;
+  --ultramarine: #1b2fd0;
+  --vermilion: #e8552f;
+  --teal: #0f7a6c;
+  --label: #fbfbf9;
+  --ink: #14151a;
+  --quiet: #4a4d57;
+  --rule: #d6d7d3;
+  --label-width: 31rem;
+  --gutter: clamp(1rem, 4vw, 3.5rem);
   color-scheme: light;
 }
 
-.dark {
-  --paper: #1e2329;
-  --paper-raised: #252b32;
-  --ink: #e4e6e1;
-  --pencil: #9aa0a8;
-  --rule: #363d45;
-  --construct: #3f6d83;
-  --redline: #f0705f;
-  --redline-ink: #1e2329;
-  --grid-opacity: 20%;
-  color-scheme: dark;
-}
-
 @theme inline {
-  --font-sans: var(--font-barlow), system-ui, sans-serif;
-  --font-display: var(--font-barlow-condensed), var(--font-barlow), system-ui, sans-serif;
-  --color-paper: var(--paper);
-  --color-paper-raised: var(--paper-raised);
+  --font-sans: var(--font-schibsted), system-ui, sans-serif;
+  --font-display: var(--font-archivo), var(--font-schibsted), system-ui, sans-serif;
+  --color-label: var(--label);
   --color-ink: var(--ink);
-  --color-pencil: var(--pencil);
+  --color-quiet: var(--quiet);
   --color-rule: var(--rule);
-  --color-construct: var(--construct);
-  --color-redline: var(--redline);
-  --color-redline-ink: var(--redline-ink);
+  --color-ultramarine: var(--ultramarine);
+  --color-vermilion: var(--vermilion);
+  --color-teal: var(--teal);
 }
 
 @layer base {
@@ -48,86 +31,209 @@
   }
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: 4.5rem;
+    scrollbar-color: var(--ink) var(--label);
   }
   body {
-    @apply bg-paper text-ink;
-    font-feature-settings: 'lnum' 1;
+    background: var(--ultramarine);
+    color: var(--ink);
+    font-variant-numeric: lining-nums;
   }
   ::selection {
-    background: color-mix(in srgb, var(--redline) 25%, transparent);
+    background: var(--ultramarine);
+    color: #ffffff;
   }
   :focus-visible {
-    outline: 2px solid var(--redline);
+    outline: 2px solid var(--ultramarine);
     outline-offset: 3px;
   }
-}
-
-@layer utilities {
-  /* Faint construction grid: 8px minor lines, 40px major lines. */
-  .construction-grid {
-    --line: color-mix(in srgb, var(--construct) var(--grid-opacity), transparent);
-    --line-major: color-mix(in srgb, var(--construct) calc(var(--grid-opacity) * 2), transparent);
-    background-image:
-      linear-gradient(to right, var(--line-major) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--line-major) 1px, transparent 1px),
-      linear-gradient(to right, var(--line) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
-    background-size: 40px 40px, 40px 40px, 8px 8px, 8px 8px;
+  .room :focus-visible,
+  .room:focus-visible {
+    outline-color: var(--ultramarine);
   }
-  .tabular {
-    font-variant-numeric: tabular-nums lining-nums;
+  a {
+    text-underline-offset: 0.2em;
   }
 }
 
-/* Theme switch: a circular wipe from the toggle button (see theme-toggle.tsx). */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
+/* The stage sits behind everything and never takes input. */
+.gallery-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gallery-stage[data-ready] {
+  opacity: 1;
+}
+.gallery-stage canvas {
+  display: block;
 }
 
-/* Range input styled as a drafting slider. */
-.gear-slider {
-  appearance: none;
-  background: transparent;
-  height: 1.5rem;
-  cursor: pointer;
+/* A room is a stretch of the walk; its label scrolls over the fixed scene. */
+.room {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 118svh;
+  padding: 7rem var(--gutter) 6rem;
 }
-.gear-slider::-webkit-slider-runnable-track {
+.room[data-label="right"] {
+  align-items: flex-end;
+}
+.room[data-size="wide"] {
+  --label-width: 43rem;
+}
+.room-still {
+  display: none;
+}
+
+/* Museum wall label: opaque, so reading never depends on what's behind it. */
+.wall-label {
+  position: relative;
+  width: min(100%, var(--label-width));
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  background: var(--label);
+  box-shadow: 0 18px 40px -22px rgb(8 10 30 / 0.55);
+}
+/* The hairline that ties a label to its case. */
+.wall-label::after {
+  content: "";
+  position: absolute;
+  top: 4.25rem;
+  width: var(--tie, clamp(2.5rem, 9vw, 9rem));
   height: 1px;
-  background: var(--ink);
+  background: var(--label);
 }
-.gear-slider::-moz-range-track {
+.room[data-label="left"] .wall-label::after {
+  left: 100%;
+}
+.room[data-label="right"] .wall-label::after {
+  right: 100%;
+}
+.room-mark {
+  margin-top: 2rem;
+  border-top: 1px solid var(--rule);
+  padding-top: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--quiet);
+}
+.tech-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 1rem;
+  font-size: 0.875rem;
+  color: var(--quiet);
+}
+.dash-list > li {
+  position: relative;
+  padding-left: 1.1rem;
+  line-height: 1.6;
+}
+.dash-list > li::before {
+  content: "";
+  position: absolute;
+  top: 0.8em;
+  left: 0;
+  width: 0.55rem;
   height: 1px;
-  background: var(--ink);
+  background: var(--quiet);
 }
-.gear-slider::-webkit-slider-thumb {
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  margin-top: -7px;
-  border-radius: 9999px;
-  background: var(--paper);
-  border: 2px solid var(--redline);
-  transition: transform 150ms ease;
+
+/* First viewport: the label sits at the foot of the entrance room. */
+.room-entrance {
+  min-height: 100svh;
+  justify-content: flex-end;
+  padding-bottom: 2.5rem;
 }
-.gear-slider::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 9999px;
-  background: var(--paper);
-  border: 2px solid var(--redline);
+
+/* Phones: the sculpture holds the upper screen, the label follows below it. */
+@media (max-width: 767px) {
+  .room {
+    padding-top: 58svh;
+    padding-bottom: 3rem;
+    min-height: 0;
+  }
+  .room-entrance {
+    min-height: 100svh;
+    padding-top: 46svh;
+    padding-bottom: 1.25rem;
+  }
+  .wall-label::after {
+    display: none;
+  }
 }
-.gear-slider:active::-webkit-slider-thumb {
-  transform: scale(1.25);
+
+/* Still tier: no WebGL, reduced motion or a weak phone. */
+html[data-tier="still"] .gallery-stage {
+  display: none;
 }
-.gear-slider:focus-visible {
-  outline-offset: 6px;
+html[data-tier="still"] .room {
+  background: var(--room-color);
+  padding-top: 6rem;
+}
+html[data-tier="still"] .room-entrance {
+  min-height: 100svh;
+}
+html[data-tier="still"] .room-still {
+  display: block;
+  position: sticky;
+  top: 0;
+  flex: none;
+  align-self: stretch;
+  height: 100svh;
+  margin: -6rem calc(var(--gutter) * -1) -100svh;
+  margin-top: -6rem;
+  background: var(--room-still) center / cover;
+}
+html[data-tier="still"] .room-still + .wall-label {
+  margin-top: 6rem;
+}
+@media (max-width: 767px) {
+  html[data-tier="still"] .room-still {
+    background-position: 78% center;
+  }
+}
+
+/* List view: one plain document, the same words and the same order. */
+html[data-view="list"] body {
+  background: var(--label);
+}
+html[data-view="list"] .gallery-stage,
+html[data-view="list"] .room-still,
+html[data-view="list"] .room-mark {
+  display: none;
+}
+html[data-view="list"] .room,
+html[data-view="list"] .room-entrance {
+  background: none;
+  display: block;
+  min-height: 0;
+  padding: 2.5rem var(--gutter) 0;
+}
+html[data-view="list"] .room:first-of-type {
+  padding-top: 6.5rem;
+}
+html[data-view="list"] .wall-label {
+  width: min(100%, 46rem);
+  margin-inline: auto;
+  padding: 0 0 2.5rem;
+  background: none;
+  box-shadow: none;
+  border-bottom: 1px solid var(--rule);
+}
+html[data-view="list"] .wall-label::after {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .gallery-stage {
+    transition: none;
   }
 }

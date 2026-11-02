@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { Check, Copy, Download, Github, Linkedin } from "lucide-react";
-import { SectionHeading } from "@/components/section-heading";
+import { Room } from "@/components/room";
 import { profile } from "@/lib/content";
 
 export function ContactSection() {
@@ -31,58 +30,35 @@ export function ContactSection() {
   ];
 
   return (
-    <section id="contact" aria-labelledby="contact-heading" className="py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeading id="contact" title="Contact" intro={`${profile.availability}. Email is the fastest way to reach me.`} />
-
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-          <a
-            href={`mailto:${profile.email}`}
-            className="font-display text-[clamp(2rem,6.5vw,4.5rem)] font-semibold leading-none tracking-tight break-all underline decoration-redline decoration-2 underline-offset-[0.12em] transition-colors hover:text-redline sm:break-normal"
-          >
-            {profile.email}
-          </a>
-          <button
-            type="button"
-            onClick={copyEmail}
-            className="inline-flex w-fit items-center gap-2 rounded-[3px] border border-ink px-4 py-2 text-sm font-medium transition-colors hover:bg-ink hover:text-paper"
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.span
-                key={copied ? "copied" : "copy"}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.15 }}
-                className="inline-flex items-center gap-2"
-              >
-                {copied ? <Check className="h-4 w-4 text-redline" /> : <Copy className="h-4 w-4" />}
-                {copied ? "Copied" : "Copy email"}
-              </motion.span>
-            </AnimatePresence>
-          </button>
-          <span role="status" className="sr-only">
-            {copied ? "Email address copied" : ""}
-          </span>
-        </div>
-
-        <ul className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-rule pt-6">
-          {secondaryLinks.map(({ label, href, icon: Icon, external }) => (
-            <li key={label}>
-              <a
-                href={href}
-                {...(external
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : { download: profile.resumeFileName })}
-                className="inline-flex items-center gap-2 text-lg text-pencil transition-colors hover:text-redline"
-              >
-                <Icon className="h-5 w-5" />
-                {label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+    <Room stop="contact" id="contact" aria-labelledby="contact-heading" mark="Room 6 of 6, Exit">
+      <h2 id="contact-heading" className="font-display text-4xl font-extrabold tracking-[-0.02em] [font-stretch:115%]">
+        Contact
+      </h2>
+      <p className="mt-3 text-quiet">{profile.availability}. Email is the fastest way to reach me.</p>
+      <a href={`mailto:${profile.email}`} className="mt-6 block font-display text-[clamp(1.25rem,2.4vw,1.625rem)] font-bold break-all underline decoration-ultramarine decoration-2 transition-colors hover:text-ultramarine">
+        {profile.email}
+      </a>
+      <button type="button" onClick={copyEmail} className="mt-4 inline-flex items-center gap-2 border border-ink px-4 py-2.5 text-sm font-medium transition-colors hover:bg-ink hover:text-label">
+        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+        {copied ? "Copied" : "Copy email"}
+      </button>
+      <span role="status" className="sr-only">
+        {copied ? "Email address copied" : ""}
+      </span>
+      <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+        {secondaryLinks.map(({ label, href, icon: Icon, external }) => (
+          <li key={label}>
+            <a
+              href={href}
+              {...(external ? { target: "_blank", rel: "noopener noreferrer" } : { download: profile.resumeFileName })}
+              className="inline-flex items-center gap-2 text-quiet transition-colors hover:text-ultramarine"
+            >
+              <Icon className="h-5 w-5" />
+              {label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Room>
   );
 }
