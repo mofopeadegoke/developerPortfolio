@@ -75,7 +75,7 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
   const side = phone ? 160 : 300;
   const size = useThree((state) => state.size);
   const setDpr = useThree((state) => state.setDpr);
-  const { material, glow } = useMemo(() => createFormMaterial(side), [side]);
+  const { material, glow, depth } = useMemo(() => createFormMaterial(side), [side]);
   const [ready, setReady] = useState(false);
   const [shed, setShed] = useState(0);
 
@@ -114,24 +114,29 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
 
   useEffect(() => {
     let cancelled = false;
-    let texture: THREE.DataArrayTexture | null = null;
-    buildShapes(side, phone, (data) => {
-      if (cancelled) return;
-      texture = new THREE.DataArrayTexture(data, side, side, stops.length);
+    const textures: THREE.DataArrayTexture[] = [];
+    const makeTexture = (data: Float32Array) => {
+      const texture = new THREE.DataArrayTexture(data, side, side, stops.length);
       texture.format = THREE.RGBAFormat;
       texture.type = THREE.FloatType;
       texture.minFilter = texture.magFilter = THREE.NearestFilter;
       texture.needsUpdate = true;
-      material.uniforms.uShapes.value = texture;
+      textures.push(texture);
+      return texture;
+    };
+    buildShapes(side, phone, (data, normals) => {
+      if (cancelled) return;
+      material.uniforms.uShapes.value = makeTexture(data);
+      material.uniforms.uNormals.value = makeTexture(normals);
       setReady(true);
       // Only now can the name stand in for the page heading.
       onReady();
     }).then(() => {
-      if (!cancelled && texture) texture.needsUpdate = true;
+      if (!cancelled) for (const texture of textures) texture.needsUpdate = true;
     });
     return () => {
       cancelled = true;
-      texture?.dispose();
+      for (const texture of textures) texture.dispose();
     };
   }, [material, onReady, phone, side]);
 
@@ -198,6 +203,14 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     uniforms.uMaxSize.value = 8 * ratio;
     glow.uniforms.uSize.value = 147 * ratio;
     glow.uniforms.uMaxSize.value = 40 * ratio;
+    depth.uniforms.uSize.value = (phone ? 80 : 50) * ratio;
+    depth.uniforms.uMaxSize.value = (phone ? 26 : 18) * ratio;
+
+    // The train's run down the track follows the scroll through Experience.
+    const start = anchors.current[1] ?? 0;
+    // On phones the words soon cover the screen, so the run happens before them.
+    const end = phone ? start + viewport * 0.42 : (anchors.current[2] ?? start + 1) - viewport * 0.9;
+    uniforms.uTrain.value = THREE.MathUtils.clamp((scroll - start) / Math.max(end - start, 1), 0, 1);
 
     uniforms.uTurn.value = state.clock.elapsedTime * 0.22 + scroll * 0.0012;
     const wormhole = stops.findIndex((stop) => stop.id === "wormhole");
@@ -218,9 +231,12 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     const b = formLayout(stops[to], size.width, size.height, phone);
     form.position.set(THREE.MathUtils.lerp(a.x, b.x, mix), THREE.MathUtils.lerp(a.y, b.y, mix), 0);
     form.scale.setScalar(THREE.MathUtils.lerp(a.scale, b.scale, mix));
-    const sway = THREE.MathUtils.lerp(0.06, 0.3, THREE.MathUtils.smoothstep(position.current, 0, 1));
-    form.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * sway + tilt.current.x * 0.5;
-    form.rotation.x = tilt.current.y * 0.3;
+    // The train keeps to its track, straight down the screen.
+    const held = 1 - THREE.MathUtils.smoothstep(Math.abs(position.current - 1), 0.4, 1);
+    const sway = THREE.MathUtils.lerp(0.06, 0.3, THREE.MathUtils.smoothstep(position.current, 0, 1)) * (1 - held);
+    form.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * sway + tilt.current.x * 0.5 * (1 - held * 0.9);
+    form.rotation.x = tilt.current.y * 0.3 * (1 - held);
+    uniforms.uStraight.value = form.position.x * held;
 
     const speed = (scroll - lastScroll.current) / Math.max(delta, 0.008) / 3000;
     lastScroll.current = scroll;
@@ -253,6 +269,7 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
       />
       {ready && (
         <group ref={points}>
+          <points geometry={geometry} material={depth} frustumCulled={false} renderOrder={-1} />
           {!phone && <points geometry={glowGeometry} material={glow} frustumCulled={false} />}
           <points geometry={geometry} material={material} frustumCulled={false} />
         </group>

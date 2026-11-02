@@ -288,6 +288,7 @@ One plain document on Ground, switched from the navigation bar and remembered be
 - **Do** derive a shape from real data wherever it shows a quantity.
 - **Do** change Ground in `app/globals.css`, `app/layout.tsx`, the canvas, the backdrop and the icon and social images together, since each reads its own copy.
 - **Do** recapture both still images in `public/rooms/` whenever a shape or its layout changes.
+- **Do** keep models solid: light them live from their surface normals, hide faces turned away, and let a depth pass block what is behind.
 - **Do** keep the form away from words: dim it on desktop, and use the solid sheet on phones.
 - **Do** check every new surface in all three tiers and in list view.
 

@@ -2,7 +2,7 @@
 
 Personal portfolio site for Daniel Mofopefoluwa Adegoke, Software Engineer.
 
-A single form of glowing copper particles rebuilds itself as you scroll: your name, a steam train of past jobs, a frying pan tossing a resume, three meshing gears, a toolbox. It parts around the cursor, bursts on click and streaks when you scroll fast. The wormhole fly-through only plays when a visitor presses its button. Phones get a calmer version. "List view" in the navigation shows the same content as one plain page.
+A single form of glowing copper particles rebuilds itself as you scroll: your name, a steam train driving down its track, a frying pan tossing a resume, three meshing gears, a toolbox. It parts around the cursor, bursts on click and streaks when you scroll fast. The wormhole fly-through only plays when a visitor presses its button. Phones get a calmer version. "List view" in the navigation shows the same content as one plain page.
 
 ## Stack
 

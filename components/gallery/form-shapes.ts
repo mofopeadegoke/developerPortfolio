@@ -4,13 +4,14 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { SVGLoader } from "three-stdlib";
-import { experience, skillGroups } from "@/lib/content";
+import { experience } from "@/lib/content";
 import { involuteGear } from "@/lib/gear";
 import { stops } from "@/lib/gallery";
 
 // Every shape the form takes is real geometry, and where possible real data:
-// each train carriage is as long as the job it stands for, the toolbox holds one
-// tool per skill group, the gears are true involute profiles.
+// each train carriage is as long as the job it stands for, the gears are true
+// involute profiles. Models are solid: every point keeps its surface normal, so
+// the shader can light it live and hide the side facing away.
 //
 // A shape is made of parts. Each part owns a share of the particles and a group
 // number, which tells the shader how that part behaves: which embers rise, which
@@ -76,72 +77,67 @@ function monthsOf(job: { start: string; end: string }) {
 function layoutTrain() {
   const months = experience.map(monthsOf);
   const total = months.reduce((sum, value) => sum + value, 0);
-  const engine = 0.5;
-  const gap = 0.035;
-  const base = 0.14;
-  const spare = 2 - engine - (gap + base) * months.length;
-  let right = 1 - engine - gap;
+  const engine = 0.62;
+  const gap = 0.05;
+  const base = 0.3;
+  const spare = 3.4 - engine - (gap + base) * months.length;
+  let front = 1 - engine - gap;
   const carriages = months.map((value) => {
     const length = base + (spare * value) / total;
-    const carriage = { x: right - length / 2, length };
-    right -= length + gap;
+    const carriage = { z: front - length / 2, length };
+    front -= length + gap;
     return carriage;
   });
-  const wheels = [0.88, 0.62, ...carriages.flatMap(({ x, length }) => [x + length / 2 - 0.055, x - length / 2 + 0.055])];
-  return { carriages, wheels, wheelY: -0.17, chimney: [0.86, 0.32] as const };
+  const wheels = [0.82, 0.5, ...carriages.flatMap(({ z, length }) => [z + length / 2 - 0.1, z - length / 2 + 0.1])];
+  return { carriages, wheels, wheelY: -0.2, chimney: [0.48, 0.84] as const, pitch: 0.5 };
 }
 
 export const TRAIN = layoutTrain();
 
-function wheel(x: number) {
-  const parts: THREE.BufferGeometry[] = [new THREE.TorusGeometry(0.055, 0.012, 8, 24)];
-  for (const angle of [0, Math.PI / 3, (2 * Math.PI) / 3]) {
-    const spoke = box(0.11, 0.012, 0.012);
-    spoke.rotateZ(angle);
-    parts.push(spoke);
-  }
-  const built = combine(parts);
-  built.translate(x, TRAIN.wheelY, 0.09);
-  return built;
+function wheelPair(z: number) {
+  const side = (x: number) => {
+    const parts: THREE.BufferGeometry[] = [new THREE.TorusGeometry(0.075, 0.016, 8, 26), new THREE.CylinderGeometry(0.03, 0.03, 0.03, 12).rotateX(Math.PI / 2)];
+    for (const angle of [0, Math.PI / 3, (2 * Math.PI) / 3]) parts.push(box(0.15, 0.014, 0.014).rotateZ(angle));
+    return combine(parts).rotateY(Math.PI / 2).translate(x, TRAIN.wheelY, z);
+  };
+  return combine([side(0.23), side(-0.23)]);
 }
 
-/** Experience: a steam train chugging along, sleepers rushing past beneath it. */
+/** Experience: a steam train driving down its track towards the viewer. */
 function experienceParts(): Part[] {
-  const boiler = new THREE.CylinderGeometry(0.1, 0.1, 0.36, 24);
-  boiler.rotateZ(Math.PI / 2);
-  boiler.translate(0.8, 0, 0);
-  const chimney = new THREE.CylinderGeometry(0.05, 0.035, 0.16, 16);
-  chimney.translate(TRAIN.chimney[0], TRAIN.chimney[1] - 0.14, 0);
-  const engine = [boiler, chimney, box(0.2, 0.3, 0.2, 0.6, 0.05, 0), box(0.26, 0.03, 0.26, 0.6, 0.215, 0)];
-  const carriages = TRAIN.carriages.map(({ x, length }) => {
-    const side = new THREE.Shape();
-    side.moveTo(-length / 2, -0.1).lineTo(length / 2, -0.1).lineTo(length / 2, 0.12).lineTo(-length / 2, 0.12).closePath();
-    const windows = Math.max(1, Math.floor(length / 0.15));
-    for (let i = 0; i < windows; i++) {
-      const centre = -length / 2 + (length * (i + 0.5)) / windows;
-      const pane = new THREE.Path();
-      pane.moveTo(centre - 0.04, 0.0).lineTo(centre + 0.04, 0.0).lineTo(centre + 0.04, 0.08).lineTo(centre - 0.04, 0.08).closePath();
-      side.holes.push(pane);
-    }
-    const body = extrude(side, 0.16);
-    body.translate(x, 0, -0.08);
-    return body;
+  const along = (geometry: THREE.BufferGeometry) => geometry.rotateX(Math.PI / 2);
+  const boiler = along(new THREE.CylinderGeometry(0.2, 0.2, 0.5, 32)).translate(0, 0.06, 0.74);
+  const smokebox = along(new THREE.CylinderGeometry(0.21, 0.21, 0.05, 32)).translate(0, 0.06, 1);
+  const chimney = new THREE.CylinderGeometry(0.075, 0.05, 0.2, 18).translate(0, TRAIN.chimney[0] - 0.1, TRAIN.chimney[1]);
+  const dome = new THREE.SphereGeometry(0.08, 16, 12).translate(0, 0.28, 0.62);
+  const cowcatcher = new THREE.ConeGeometry(0.26, 0.26, 4).rotateY(Math.PI / 4).rotateX(Math.PI / 2).scale(1, 0.55, 1).translate(0, -0.2, 1.06);
+  const engine = [boiler, smokebox, chimney, dome, cowcatcher, box(0.5, 0.42, 0.3, 0, 0.1, 0.34), box(0.56, 0.03, 0.4, 0, 0.33, 0.34), box(0.46, 0.06, 0.74, 0, -0.14, 0.66)];
+  const roofs = TRAIN.carriages.map(({ z, length }) => new THREE.CylinderGeometry(0.25, 0.25, length, 26, 1, false, -Math.PI / 2, Math.PI).rotateZ(Math.PI / 2).rotateY(Math.PI / 2).scale(1, 0.3, 1));
+  const carriages = TRAIN.carriages.flatMap(({ z, length }, i) => [box(0.5, 0.36, length, 0, 0.04, z), roofs[i].rotateX(Math.PI / 2).rotateZ(0).translate(0, 0.22, z), box(0.44, 0.05, length * 0.9, 0, -0.16, z)]);
+  const windows = TRAIN.carriages.flatMap(({ z, length }) => {
+    const count = Math.max(1, Math.floor(length / 0.2));
+    return Array.from({ length: count }, (_, i) => {
+      const at = z - length / 2 + (length * (i + 0.5)) / count;
+      return [box(0.012, 0.13, 0.1, 0.255, 0.08, at), box(0.012, 0.13, 0.1, -0.255, 0.08, at)];
+    }).flat();
   });
   const sleepers: THREE.BufferGeometry[] = [];
-  for (let i = 0; i < 18; i++) sleepers.push(box(0.05, 0.015, 0.3, -1.15 + i * 0.1353, -0.25, 0));
+  for (let i = 0; i < 46; i++) sleepers.push(box(0.68, 0.025, 0.07, 0, -0.3, 4.2 - i * 0.26));
   return [
-    { share: 0.28, group: 0, geometry: combine(engine) },
-    { share: 0.41, group: 0, geometry: combine(carriages) },
-    ...TRAIN.wheels.map((x, i) => ({ share: 0.006, group: 10 + i, shade: 0.6, geometry: wheel(x) })),
-    { share: 0.05, group: 2, shade: 0.5, geometry: combine([box(2.3, 0.012, 0.02, 0, -0.235, 0.09), box(2.3, 0.012, 0.02, 0, -0.235, -0.09)]) },
-    { share: 0.07, group: 3, shade: 0.45, geometry: combine(sleepers) },
+    { share: 0.298, group: 0, geometry: combine(engine) },
+    { share: 0.3, group: 1, geometry: combine(carriages) },
+    { share: 0.08, group: 1, shade: 1, geometry: combine(windows) },
+    { share: 0.012, group: 0, shade: 1, geometry: new THREE.SphereGeometry(0.035, 12, 10).translate(0, 0.08, 1.04) },
+    ...TRAIN.wheels.map((z, i) => ({ share: 0.008, group: 10 + i, geometry: wheelPair(z) })),
+    { share: 0.07, group: 2, geometry: combine([box(0.025, 0.03, 12.4, 0.23, -0.27, -1.8), box(0.025, 0.03, 12.4, -0.23, -0.27, -1.8)]) },
+    { share: 0.09, group: 3, geometry: combine(sleepers) },
     {
-      share: 0.116,
+      share: 0.05,
       group: 4,
       shade: 0.6,
       point: ({ position: at, normal }) => {
-        at.set(TRAIN.chimney[0], TRAIN.chimney[1], 0);
-        normal.set(0, 0, 1);
+        at.set(0, TRAIN.chimney[0], TRAIN.chimney[1]);
+        normal.set(0, 0, 0);
       },
     },
   ];
@@ -151,10 +147,13 @@ function experienceParts(): Part[] {
 export const PAN = { x: -0.32, y: -0.62, tilt: 0.45 };
 
 function uncookedParts(): Part[] {
-  const profile = [[0, 0], [0.66, 0], [0.74, 0.03], [0.78, 0.2], [0.8, 0.21]].map(([x, y]) => new THREE.Vector2(x, y));
-  const bowl = new THREE.LatheGeometry(profile, 56);
-  const pan = combine([bowl, box(0.62, 0.05, 0.1, 1.09, 0.17, 0)]);
+  const profile = [[0, 0], [0.72, 0], [0.8, 0.05], [0.85, 0.26], [0.81, 0.28], [0.75, 0.1], [0.7, 0.06], [0, 0.06]].map(([x, y]) => new THREE.Vector2(x, y));
+  const bowl = new THREE.LatheGeometry(profile, 64);
+  const handle = new THREE.CylinderGeometry(0.055, 0.04, 0.62, 16).rotateZ(Math.PI / 2 - 0.12).translate(1.14, 0.24, 0);
+  const rivets = [0.07, -0.07].map((z) => new THREE.SphereGeometry(0.022, 10, 8).translate(0.76, 0.2, z));
+  const pan = combine([bowl, handle, ...rivets]);
   pan.rotateX(PAN.tilt);
+  pan.rotateY(0.22);
   pan.translate(PAN.x, PAN.y, 0);
 
   const page = new THREE.Shape();
@@ -177,7 +176,7 @@ function uncookedParts(): Part[] {
       point: ({ position: at, normal }) => {
         const angle = Math.random() * Math.PI * 2;
         at.set(PAN.x + Math.cos(angle) * 0.55, PAN.y + 0.15, Math.sin(angle) * 0.4);
-        normal.set(0, 1, 0);
+        normal.set(0, 0, 0);
       },
     },
   ];
@@ -266,7 +265,7 @@ function inscribeParts(font: Font): Part[] {
         const angle = Math.random() * Math.PI * 2;
         ring.set(Math.cos(angle), 0.02, Math.sin(angle) * 0.6).applyAxisAngle(new THREE.Vector3(1, 0, 0), STAMP.tilt);
         at.set(ring.x, ring.y + STAMP.y, ring.z);
-        normal.set(0, 0, 1);
+        normal.set(0, 0, 0);
       },
     },
   ];
@@ -326,64 +325,59 @@ function wormholeParts(): Part[] {
   });
 }
 
-/** One tool for each skill group, drawn upright around its own centre. */
+/** Six solid tools, each built upright around its own centre. */
 const TOOLS: (() => THREE.BufferGeometry)[] = [
   // Hammer
-  () => combine([box(0.07, 0.62, 0.07), box(0.32, 0.13, 0.13, 0.04, 0.28, 0)]),
+  () => combine([new THREE.CylinderGeometry(0.03, 0.04, 0.62, 14), new THREE.CylinderGeometry(0.07, 0.07, 0.3, 18).rotateZ(Math.PI / 2).translate(0.03, 0.29, 0)]),
   // Screwdriver
-  () => {
-    const grip = new THREE.CylinderGeometry(0.055, 0.045, 0.28, 16);
-    grip.translate(0, -0.17, 0);
-    const shaft = new THREE.CylinderGeometry(0.016, 0.016, 0.34, 10);
-    shaft.translate(0, 0.14, 0);
-    return combine([grip, shaft, box(0.05, 0.05, 0.012, 0, 0.32, 0)]);
-  },
+  () => combine([new THREE.CylinderGeometry(0.06, 0.05, 0.28, 8).translate(0, -0.17, 0), new THREE.CylinderGeometry(0.016, 0.016, 0.36, 10).translate(0, 0.14, 0), box(0.05, 0.05, 0.014, 0, 0.33, 0)]),
   // Wrench
   () => {
     const head = new THREE.Shape();
-    head.absarc(0, 0.27, 0.12, -0.75 + Math.PI / 2 + 1.5, Math.PI / 2 - 0.75 + 0.0 + Math.PI * 2 - 1.5 + 1.5, false);
+    head.absarc(0, 0.27, 0.13, Math.PI / 2 + 0.75, Math.PI * 2 + Math.PI / 2 - 0.75, false);
     head.lineTo(0, 0.25);
     head.closePath();
-    const built = extrude(head, 0.05);
-    return combine([built, box(0.09, 0.5, 0.05, 0, -0.08, 0.025)]);
+    return combine([extrude(head, 0.07).translate(0, 0, -0.035), box(0.09, 0.52, 0.07, 0, -0.08, 0)]);
   },
   // Pliers
   () => {
-    const arm = (lean: number) => {
-      const part = box(0.055, 0.66, 0.04);
-      part.rotateZ(lean);
-      return part;
-    };
-    const pivot = new THREE.CylinderGeometry(0.05, 0.05, 0.05, 16);
-    pivot.rotateX(Math.PI / 2);
-    pivot.translate(0, 0.1, 0);
-    const a = arm(0.2);
-    const b = arm(-0.2);
-    a.translate(0, 0.1, 0);
-    b.translate(0, 0.1, 0);
-    return combine([a, b, pivot]);
+    const arm = (lean: number) => box(0.06, 0.66, 0.05).rotateZ(lean).translate(0, 0.1, 0);
+    return combine([arm(0.2), arm(-0.2), new THREE.CylinderGeometry(0.055, 0.055, 0.09, 18).rotateX(Math.PI / 2).translate(0, 0.1, 0)]);
   },
   // Paintbrush
-  () => combine([box(0.05, 0.4, 0.05, 0, -0.1, 0), box(0.14, 0.09, 0.06, 0, 0.13, 0), box(0.17, 0.2, 0.05, 0, 0.27, 0)]),
-  // Ruler
-  () => {
-    const ticks: THREE.BufferGeometry[] = [box(0.13, 0.66, 0.02)];
-    for (let i = 0; i < 9; i++) ticks.push(box(i % 2 ? 0.05 : 0.08, 0.012, 0.03, -0.03, -0.28 + i * 0.07, 0.01));
-    return combine(ticks);
-  },
+  () => combine([new THREE.CylinderGeometry(0.025, 0.04, 0.4, 14).translate(0, -0.1, 0), box(0.14, 0.09, 0.07, 0, 0.13, 0), box(0.18, 0.2, 0.06, 0, 0.27, 0)]),
+  // Tape measure
+  () => combine([new THREE.CylinderGeometry(0.17, 0.17, 0.09, 30).rotateX(Math.PI / 2), box(0.22, 0.05, 0.09, 0.05, -0.16, 0), box(0.09, 0.3, 0.012, 0.13, -0.3, 0)]),
 ];
 
-export const TOOL_COUNT = Math.max(TOOLS.length, skillGroups.length);
-
-/** Skills: a toolbox bursts open and its tools fly out to orbit it. */
+/** Skills: a real hollow toolbox whose lid opens and whose tools tumble out. */
 function skillsParts(): Part[] {
-  const body = box(1.5, 0.52, 0.72, 0, -0.62, 0);
-  const handle = new THREE.TorusGeometry(0.17, 0.022, 8, 28, Math.PI);
-  handle.translate(0, -0.31, 0);
-  const lid = combine([box(1.5, 0.08, 0.72, 0, -0.33, 0), handle]);
+  const wall = 0.035;
+  const [width, height, depth] = [1.5, 0.52, 0.76];
+  const y = -0.62;
+  const body = [
+    box(width, wall, depth, 0, y - height / 2, 0),
+    box(width, height, wall, 0, y, depth / 2),
+    box(width, height, wall, 0, y, -depth / 2),
+    box(wall, height, depth, width / 2, y, 0),
+    box(wall, height, depth, -width / 2, y, 0),
+    box(width + 0.04, 0.05, depth + 0.04, 0, y + height / 2 - 0.02, 0),
+    box(0.14, 0.14, 0.03, 0.42, y + 0.14, depth / 2 + 0.02),
+    box(0.14, 0.14, 0.03, -0.42, y + 0.14, depth / 2 + 0.02),
+  ];
+  const top = -0.3;
+  const handle = new THREE.TorusGeometry(0.17, 0.024, 10, 30, Math.PI).translate(0, top + 0.03, 0.02);
+  const lid = [
+    box(width + 0.04, wall, depth + 0.04, 0, top, 0),
+    box(width + 0.04, 0.09, wall, 0, top - 0.045, depth / 2 + 0.02),
+    box(width + 0.04, 0.09, wall, 0, top - 0.045, -depth / 2 - 0.02),
+    box(wall, 0.09, depth + 0.04, width / 2 + 0.02, top - 0.045, 0),
+    box(wall, 0.09, depth + 0.04, -width / 2 - 0.02, top - 0.045, 0),
+    handle,
+  ];
   return [
-    { share: 0.3, group: 0, geometry: body },
-    { share: 0.16, group: 1, geometry: lid },
+    { share: 0.3, group: 0, geometry: combine(body) },
+    { share: 0.16, group: 1, geometry: combine(lid) },
     ...TOOLS.map((tool, i) => {
       const built = clean(tool());
       built.translate(-0.55 + 0.22 * i, -0.45, 0);
@@ -394,7 +388,7 @@ function skillsParts(): Part[] {
 
 const LIGHT = new THREE.Vector3(0.35, 0.65, 0.68).normalize();
 
-function fillLayer(data: Float32Array, layer: number, count: number, parts: Part[]) {
+function fillLayer(data: Float32Array, normals: Float32Array, layer: number, count: number, parts: Part[]) {
   const offset = layer * count * 4;
   const point: Point = { position: new THREE.Vector3(), normal: new THREE.Vector3() };
   let written = 0;
@@ -413,6 +407,11 @@ function fillLayer(data: Float32Array, layer: number, count: number, parts: Part
       const group = typeof part.group === "function" ? part.group(point.position, i) : part.group;
       // Whole part is the group, fraction is how much the point faces the light.
       data[at + 3] = group + shade * 0.99;
+      // A fixed shade means a light source or a loose spark: nothing to turn.
+      const lit = part.shade === undefined;
+      normals[at] = lit ? point.normal.x : 0;
+      normals[at + 1] = lit ? point.normal.y : 0;
+      normals[at + 2] = lit ? point.normal.z : 0;
       written += 1;
     }
   });
@@ -422,9 +421,11 @@ function fillLayer(data: Float32Array, layer: number, count: number, parts: Part
   for (let i = count - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     for (let k = 0; k < 4; k++) {
-      const swap = data[offset + i * 4 + k];
-      data[offset + i * 4 + k] = data[offset + j * 4 + k];
-      data[offset + j * 4 + k] = swap;
+      for (const list of [data, normals]) {
+        const swap = list[offset + i * 4 + k];
+        list[offset + i * 4 + k] = list[offset + j * 4 + k];
+        list[offset + j * 4 + k] = swap;
+      }
     }
   }
 }
@@ -433,10 +434,11 @@ function fillLayer(data: Float32Array, layer: number, count: number, parts: Part
  * Samples every shape into one float array: side x side particles, one layer
  * per stop.
  */
-export async function buildShapes(side: number, stacked: boolean, onFirst: (data: Float32Array) => void) {
+export async function buildShapes(side: number, stacked: boolean, onFirst: (data: Float32Array, normals: Float32Array) => void) {
   const font = new FontLoader().parse(await (await fetch("/fonts/gallery-display.json")).json());
   const count = side * side;
   const data = new Float32Array(count * 4 * stops.length);
+  const normals = new Float32Array(count * 4 * stops.length);
 
   const name = stacked ? combine([word(font, "DANIEL", 1, 0.62), word(font, "ADEGOKE", 0.82, -0.5)]) : combine([word(font, "DANIEL ADEGOKE", 1)]);
 
@@ -455,11 +457,14 @@ export async function buildShapes(side: number, stacked: boolean, onFirst: (data
   };
 
   for (let layer = 0; layer < stops.length; layer++) {
-    fillLayer(data, layer, count, build[stops[layer].id]());
+    fillLayer(data, normals, layer, count, build[stops[layer].id]());
     if (layer === 0) {
       // Until the rest arrive, every layer is the name, so the form shows now.
-      for (let other = 1; other < stops.length; other++) data.copyWithin(other * count * 4, 0, count * 4);
-      onFirst(data);
+      for (let other = 1; other < stops.length; other++) {
+        data.copyWithin(other * count * 4, 0, count * 4);
+        normals.copyWithin(other * count * 4, 0, count * 4);
+      }
+      onFirst(data, normals);
     }
     // Yield between shapes so sampling never blocks scrolling.
     await new Promise((resolve) => setTimeout(resolve));
