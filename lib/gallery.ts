@@ -30,7 +30,7 @@ export const CAMERA_FOV = 35;
 export function formLayout(stop: Stop, width: number, height: number, phone: boolean) {
   const visibleHeight = 2 * Math.tan((CAMERA_FOV / 2) * (Math.PI / 180)) * CAMERA_DISTANCE;
   const visibleWidth = visibleHeight * (width / height);
-  if (phone) return { x: 0, y: visibleHeight * 0.24, scale: visibleWidth * 0.4 };
+  if (phone) return { x: 0, y: visibleHeight * 0.24, scale: visibleWidth * (stop.id === "top" ? 0.4 : 0.32) };
   if (stop.id === "top") return { x: 0, y: visibleHeight * 0.2, scale: Math.min(visibleWidth * 0.44, visibleHeight * 0.72) };
   const gutter = Math.max(16, Math.min(56, width * 0.04));
   const textEdge = stop.width * 16 + gutter;

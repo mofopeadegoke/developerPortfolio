@@ -33,7 +33,12 @@ const vertexShader = /* glsl */ `
 
     vec2 f = liquidFlow(p * 1.2 + aSeed, uTime * 0.35);
     vec2 g = liquidFlow(p.zxy * 1.2 - aSeed, uTime * 0.3);
-    p += vec3(f.x, g.y, f.y * g.x) * (0.008 + travel * 0.6);
+    // At rest the surface creeps like molten metal. In transit the form draws
+    // in and swirls round its axis, so shapes pour instead of scattering.
+    p += vec3(f.x, g.y, f.y * g.x) * (0.03 + travel * 0.32);
+    float swirl = travel * (1.3 + aSeed * 1.8);
+    p.xz = mat2(cos(swirl), -sin(swirl), sin(swirl), cos(swirl)) * p.xz;
+    p.xy *= 1.0 - travel * 0.5;
 
     vec4 world = modelMatrix * vec4(p, 1.0);
 
@@ -91,7 +96,7 @@ export function createFormMaterial(side: number, pixelRatio: number) {
       uDim: { value: 1 },
       uAlpha: { value: 1 },
       uSide: { value: side },
-      uSize: { value: (side > 200 ? 21 : 30) * pixelRatio },
+      uSize: { value: (side > 200 ? 21 : 19) * pixelRatio },
       uPointer: { value: new THREE.Vector3(99, 99, 0) },
       uOrigin: { value: new THREE.Vector3() },
     },
@@ -102,7 +107,7 @@ export function createFormMaterial(side: number, pixelRatio: number) {
   const glow = material.clone();
   glow.uniforms = {
     ...material.uniforms,
-    uAlpha: { value: 0.07 },
+    uAlpha: { value: side > 200 ? 0.07 : 0.035 },
     uSize: { value: material.uniforms.uSize.value * 7 },
   };
 

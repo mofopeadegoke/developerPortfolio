@@ -116,7 +116,8 @@
   justify-content: flex-end;
   padding-bottom: 2.5rem;
 }
-html[data-stage="ready"]:not([data-view="list"]):not([data-tier="still"]) .hero-name {
+html[data-stage="ready"]:not([data-view="list"]) .hero-name,
+html[data-tier="still"]:not([data-view="list"]) .hero-name {
   position: absolute;
   width: 1px;
   height: 1px;

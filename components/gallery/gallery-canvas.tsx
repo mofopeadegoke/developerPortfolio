@@ -181,7 +181,7 @@ function Form({ tier, onFallback }: { tier: Tier; onFallback: () => void }) {
     const b = formLayout(stops[to], size.width, size.height, phone);
     form.position.set(THREE.MathUtils.lerp(a.x, b.x, mix), THREE.MathUtils.lerp(a.y, b.y, mix), 0);
     form.scale.setScalar(THREE.MathUtils.lerp(a.scale, b.scale, mix));
-    const sway = from === 0 && mix < 0.05 ? 0.06 : 0.3;
+    const sway = THREE.MathUtils.lerp(0.06, 0.3, THREE.MathUtils.smoothstep(position.current, 0, 1));
     form.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * sway + tilt.current.x * 0.5;
     form.rotation.x = tilt.current.y * 0.3;
 
@@ -194,11 +194,15 @@ function Form({ tier, onFallback }: { tier: Tier; onFallback: () => void }) {
     uniforms.uBurst.value = burst.current;
     uniforms.uPointer.value.lerp(pointerGoal.current, 1 - Math.exp(-9 * delta));
 
-    // On phones words scroll across the form, so it steps back while they do.
-    let dim = 1;
+    // Words must stay readable. On phones they scroll across the form, so it
+    // steps back from just after a section starts until just before the next.
+    // On desktop the form only reaches the words while it travels.
+    let dim = 1 - Math.sin(Math.PI * mix) * 0.8;
     if (phone) {
-      const anchor = anchors.current[Math.round(position.current)] ?? 0;
-      dim = scroll > anchor + viewport * 0.14 ? 0.16 : 1;
+      const list = anchors.current;
+      let current = 0;
+      while (current < list.length - 1 && scroll >= list[current + 1] - viewport * 0.05) current++;
+      dim = scroll > list[current] + viewport * 0.14 ? 0.16 : 1;
     }
     uniforms.uDim.value = THREE.MathUtils.damp(uniforms.uDim.value, dim, 6, delta);
   });

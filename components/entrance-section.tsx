@@ -12,17 +12,17 @@ export function EntranceSection() {
       <p className="mt-2 text-xl text-quiet">{profile.role}</p>
       <p className="mt-5 text-lg leading-snug">{hero.lead}</p>
       <p className="mt-3 text-quiet">{hero.detail}</p>
-      <div className="mt-6 flex flex-wrap items-center gap-2">
-        <LinkButton href={profile.resume} download={profile.resumeFileName}>
+      <div className="mt-6 flex items-center gap-1 sm:gap-2">
+        <LinkButton href={profile.resume} download={profile.resumeFileName} className="px-4 whitespace-nowrap sm:px-5">
           Download CV
         </LinkButton>
-        <LinkButton href={`mailto:${profile.email}`} variant="outline">
+        <LinkButton href={`mailto:${profile.email}`} variant="outline" className="px-4 whitespace-nowrap sm:px-5">
           Email me
         </LinkButton>
-        <a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="grid h-11 w-11 place-items-center text-quiet transition-colors hover:text-amber">
+        <a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="grid h-11 w-10 shrink-0 place-items-center text-quiet transition-colors hover:text-amber">
           <Github className="h-5 w-5" />
         </a>
-        <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="grid h-11 w-11 place-items-center text-quiet transition-colors hover:text-amber">
+        <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="grid h-11 w-10 shrink-0 place-items-center text-quiet transition-colors hover:text-amber">
           <Linkedin className="h-5 w-5" />
         </a>
       </div>
