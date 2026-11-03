@@ -28,3 +28,8 @@ next-env.d.ts
 
 # browser screenshots from local testing
 .playwright-mcp/
+
+# Impeccable working files
+.impeccable/review/
+.impeccable/questions/
+.impeccable/mocks/

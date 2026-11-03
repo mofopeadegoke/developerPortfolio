@@ -1,45 +1,26 @@
 @import 'tailwindcss';
 
-@custom-variant dark (&:is(.dark *));
-
-/* Drafting-sheet palette. Light = vellum sheet, dark = graphite slate sheet. */
 :root {
-  --paper: #ecede8;
-  --paper-raised: #f4f5f1;
-  --ink: #23262b;
-  --pencil: #5e6269;
-  --rule: #c9cbc4;
-  --construct: #9bcbe0;
-  --redline: #c23a2e;
-  --redline-ink: #ffffff;
-  --grid-opacity: 22%;
-  color-scheme: light;
-}
-
-.dark {
-  --paper: #1e2329;
-  --paper-raised: #252b32;
-  --ink: #e4e6e1;
-  --pencil: #9aa0a8;
-  --rule: #363d45;
-  --construct: #3f6d83;
-  --redline: #f0705f;
-  --redline-ink: #1e2329;
-  --grid-opacity: 20%;
+  --ground: #0b0807;
+  --text: #f4ece4;
+  --quiet: #bcaea2;
+  --rule: #33261e;
+  --copper: #e8894f;
+  --amber: #f6bc7a;
+  --plate-width: 31rem;
+  --gutter: clamp(1rem, 4vw, 3.5rem);
   color-scheme: dark;
 }
 
 @theme inline {
-  --font-sans: var(--font-barlow), system-ui, sans-serif;
-  --font-display: var(--font-barlow-condensed), var(--font-barlow), system-ui, sans-serif;
-  --color-paper: var(--paper);
-  --color-paper-raised: var(--paper-raised);
-  --color-ink: var(--ink);
-  --color-pencil: var(--pencil);
+  --font-sans: var(--font-schibsted), system-ui, sans-serif;
+  --font-display: var(--font-archivo), var(--font-schibsted), system-ui, sans-serif;
+  --color-ground: var(--ground);
+  --color-text: var(--text);
+  --color-quiet: var(--quiet);
   --color-rule: var(--rule);
-  --color-construct: var(--construct);
-  --color-redline: var(--redline);
-  --color-redline-ink: var(--redline-ink);
+  --color-copper: var(--copper);
+  --color-amber: var(--amber);
 }
 
 @layer base {
@@ -48,86 +29,216 @@
   }
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: 4.5rem;
+    scrollbar-color: var(--copper) var(--ground);
   }
   body {
-    @apply bg-paper text-ink;
-    font-feature-settings: 'lnum' 1;
+    background: var(--ground);
+    color: var(--text);
+    font-variant-numeric: lining-nums;
   }
   ::selection {
-    background: color-mix(in srgb, var(--redline) 25%, transparent);
+    background: var(--copper);
+    color: var(--ground);
   }
   :focus-visible {
-    outline: 2px solid var(--redline);
+    outline: 2px solid var(--amber);
     outline-offset: 3px;
   }
-}
-
-@layer utilities {
-  /* Faint construction grid: 8px minor lines, 40px major lines. */
-  .construction-grid {
-    --line: color-mix(in srgb, var(--construct) var(--grid-opacity), transparent);
-    --line-major: color-mix(in srgb, var(--construct) calc(var(--grid-opacity) * 2), transparent);
-    background-image:
-      linear-gradient(to right, var(--line-major) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--line-major) 1px, transparent 1px),
-      linear-gradient(to right, var(--line) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
-    background-size: 40px 40px, 40px 40px, 8px 8px, 8px 8px;
-  }
-  .tabular {
-    font-variant-numeric: tabular-nums lining-nums;
+  a {
+    text-underline-offset: 0.2em;
   }
 }
 
-/* Theme switch: a circular wipe from the toggle button (see theme-toggle.tsx). */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
+/* The stage sits behind everything and never takes input. */
+.gallery-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gallery-stage[data-ready] {
+  opacity: 1;
+}
+.gallery-stage canvas {
+  display: block;
 }
 
-/* Range input styled as a drafting slider. */
-.gear-slider {
-  appearance: none;
-  background: transparent;
-  height: 1.5rem;
-  cursor: pointer;
+/* One stop on the walk: the words sit on the dark ground, the form opposite. */
+.room {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 75svh;
+  padding: 5rem var(--gutter) 4rem;
 }
-.gear-slider::-webkit-slider-runnable-track {
+/* The last stop needs a full screen, so the page can scroll far enough for
+   the form to finish its final change. */
+.room[data-stop="contact"] {
+  min-height: 100svh;
+}
+.room[data-label="right"] {
+  align-items: flex-end;
+}
+.room[data-size="wide"] {
+  --plate-width: 43rem;
+}
+.plate {
+  position: relative;
+  width: min(100%, var(--plate-width));
+}
+.tech-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 1rem;
+  font-size: 0.875rem;
+  color: var(--quiet);
+}
+.dash-list > li {
+  position: relative;
+  padding-left: 1.1rem;
+  line-height: 1.6;
+}
+.dash-list > li::before {
+  content: "";
+  position: absolute;
+  top: 0.8em;
+  left: 0;
+  width: 0.55rem;
   height: 1px;
-  background: var(--ink);
+  background: var(--copper);
 }
-.gear-slider::-moz-range-track {
+
+/* First viewport: the name is the form, the words sit at its foot. */
+.room-entrance {
+  min-height: 100svh;
+  justify-content: flex-end;
+  padding-bottom: 2.5rem;
+}
+html[data-stage="ready"]:not([data-view="list"]):not([data-tier="still"]) .hero-name {
+  position: absolute;
+  width: 1px;
   height: 1px;
-  background: var(--ink);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
-.gear-slider::-webkit-slider-thumb {
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  margin-top: -7px;
-  border-radius: 9999px;
-  background: var(--paper);
-  border: 2px solid var(--redline);
-  transition: transform 150ms ease;
+
+/* Numbers set as type stand in for the form wherever it does not run. */
+.room-proof {
+  display: none;
 }
-.gear-slider::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 9999px;
-  background: var(--paper);
-  border: 2px solid var(--redline);
+.proof {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
-.gear-slider:active::-webkit-slider-thumb {
-  transform: scale(1.25);
+.proof-figure {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 15vw, 6rem);
+  font-weight: 800;
+  font-stretch: 115%;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--copper);
+  white-space: nowrap;
 }
-.gear-slider:focus-visible {
-  outline-offset: 6px;
+.proof-caption {
+  max-width: 16rem;
+  font-size: 0.875rem;
+  line-height: 1.43;
+  color: var(--quiet);
+}
+
+/* Still: phones, tablets, reduced motion or no WebGL. No stage at all, and
+   the page carries itself on type, rules and space. */
+html[data-tier="still"] .gallery-stage {
+  display: none;
+}
+html[data-tier="still"] .room-proof {
+  display: block;
+}
+html[data-tier="still"] .hero-name {
+  font-size: clamp(3rem, 13vw, 6rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+}
+
+/* Large screens: the number holds the side the form would take. */
+@media (min-width: 1024px) {
+  html[data-tier="still"] .room-proof {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    padding: 0 var(--gutter);
+    pointer-events: none;
+  }
+  html[data-tier="still"] .room[data-label="left"] .room-proof {
+    justify-content: flex-end;
+  }
+  html[data-tier="still"] .proof {
+    position: sticky;
+    top: 42svh;
+    align-self: flex-start;
+    margin-top: 30svh;
+  }
+}
+
+/* Smaller screens: one column, each stop opened by its number and a rule. */
+@media (max-width: 1023px) {
+  html[data-tier="still"] .room {
+    align-items: stretch;
+    min-height: 0;
+    padding: 4rem var(--gutter);
+  }
+  html[data-tier="still"] .room:not(.room-entrance) {
+    border-top: 1px solid var(--rule);
+  }
+  html[data-tier="still"] .room-entrance {
+    min-height: 88svh;
+    padding-top: 6rem;
+  }
+  html[data-tier="still"] .room-proof {
+    margin-bottom: 2rem;
+  }
+  html[data-tier="still"] .plate {
+    width: min(100%, var(--plate-width));
+  }
+}
+
+/* List view, on the stage's devices only: one plain document, the same words
+   and the same order. */
+html[data-view="list"] .gallery-stage,
+html[data-view="list"] .room-proof {
+  display: none;
+}
+html[data-view="list"]:not([data-tier="still"]) .room,
+html[data-view="list"]:not([data-tier="still"]) .room-entrance {
+  display: block;
+  min-height: 0;
+  padding: 2.5rem var(--gutter) 0;
+}
+html[data-view="list"]:not([data-tier="still"]) .room:first-of-type {
+  padding-top: 6.5rem;
+}
+html[data-view="list"]:not([data-tier="still"]) .plate {
+  width: min(100%, 46rem);
+  margin-inline: auto;
+  padding: 0 0 2.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+html[data-tier="still"] .view-toggle {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .gallery-stage {
+    transition: none;
   }
 }

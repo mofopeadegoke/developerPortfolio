@@ -195,7 +195,7 @@ export const projects: Project[] = [
     result: "3D gear models from 5 parameters, geometry written from scratch",
     points: [
       "Generates parametric 3D gear models from 5 configurable parameters.",
-      "Implements the computational geometry from first principles rather than wrapping an existing package. The gear at the top of this page uses the same involute maths.",
+      "Implements the computational geometry from first principles rather than wrapping an existing package. The gear on this page uses the same involute maths.",
     ],
     stack: ["C++", "Computational geometry", "STL"],
     links: [{ label: "Source on GitHub", href: "https://github.com/mofopeadegoke/gearGeneration" }],
@@ -306,7 +306,7 @@ export const skillGroups: SkillGroup[] = [
 export const about = {
   paragraphs: [
     "I work across the whole stack but I'm happiest where interfaces meet hard engineering: a component library other developers can trust, or an undocumented C++ engine I had to learn by reading its source.",
-    "I graduated in June 2026 with a B.Sc. in Software Engineering and have been shipping software since 2022, when I launched Inscribe.",
+    "I graduated in June 2026 with a B.Sc. in Software Engineering. I've been writing code since 2020 and shipping software since 2022, when I launched Inscribe.",
     "Lately I've moved into full-stack and AI work: Smart Bookmarks runs on Next.js and PostgreSQL and uses Claude to summarise and tag what you save, and Uncooked is an open-source plugin that tailors resumes without adding anything untrue, backed by its own evals.",
   ],
   education: {
@@ -338,3 +338,23 @@ export const achievements: Achievement[] = [
   { result: "Finalist", event: "Construct AI", year: "2024" },
   { result: "Finalist", event: "EMUSoft", year: "2025" },
 ];
+
+export const codingSince = "Writing code since 2020, shipping it since 2022.";
+
+export const aiFluency = {
+  result: "Top 5%",
+  text: "of AI-fluent tech professionals verified by Calyptus",
+  href: "https://www.linkedin.com/in/mofopefoluwa-daniel-adegoke-abc/details/certifications/",
+};
+
+/**
+ * The numbers the 3D form takes, keyed by the stop whose words prove them.
+ * Without WebGL the same numbers are drawn as type beside those words.
+ */
+export const proofs: Record<string, { figure: string; caption: string }> = {
+  experience: { figure: "2020", caption: "The year I started writing code" },
+  inscribe: { figure: "4,000+", caption: "Inscribe installs" },
+  skills: { figure: "Top 5%", caption: "Of AI-fluent tech professionals on Calyptus" },
+  about: { figure: "3.81", caption: "CGPA out of 4.00" },
+  awards: { figure: "0.1%", caption: "Teknofest Robotics, 2025" },
+};
