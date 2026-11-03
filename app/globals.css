@@ -72,17 +72,19 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-  min-height: 118svh;
-  padding: 7rem var(--gutter) 6rem;
+  min-height: 75svh;
+  padding: 5rem var(--gutter) 4rem;
+}
+/* The last stop needs a full screen, so the page can scroll far enough for
+   the form to finish its final change. */
+.room[data-stop="contact"] {
+  min-height: 100svh;
 }
 .room[data-label="right"] {
   align-items: flex-end;
 }
 .room[data-size="wide"] {
   --plate-width: 43rem;
-}
-.room-still {
-  display: none;
 }
 .plate {
   position: relative;
@@ -125,111 +127,111 @@ html[data-stage="ready"]:not([data-view="list"]):not([data-tier="still"]) .hero-
   white-space: nowrap;
 }
 
-/* The still image carries the name on desktop. Phones keep the live heading. */
-@media (min-width: 768px) {
-  html[data-tier="still"]:not([data-view="list"]) .hero-name {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
+/* Numbers set as type stand in for the form wherever it does not run. */
+.room-proof {
+  display: none;
+}
+.proof {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.proof-figure {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 15vw, 6rem);
+  font-weight: 800;
+  font-stretch: 115%;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--copper);
+  white-space: nowrap;
+}
+.proof-caption {
+  max-width: 16rem;
+  font-size: 0.875rem;
+  line-height: 1.43;
+  color: var(--quiet);
 }
 
-/* Phones: the form holds the upper screen, the words follow below it. */
-@media (max-width: 767px) {
-  .room {
-    padding: 62svh 0 0;
-    min-height: 0;
-  }
-  .room-entrance {
-    min-height: 100svh;
-    padding: 44svh 0 0;
-  }
-  /* The words arrive on a solid sheet, so the form above them stays at full
-     brightness and is never left glowing behind text. */
-  .plate {
-    width: 100%;
-    padding: 0.5rem var(--gutter) 3rem;
-    background: var(--ground);
-  }
-  .plate::before {
-    content: "";
-    position: absolute;
-    inset: -5rem 0 auto;
-    height: 5rem;
-    background: linear-gradient(to bottom, transparent, var(--ground));
-    pointer-events: none;
-  }
-  /* The sheet's lower edge fades too, so it never cuts across the form. */
-  .plate::after {
-    content: "";
-    position: absolute;
-    inset: auto 0 -5rem;
-    height: 5rem;
-    background: linear-gradient(to top, transparent, var(--ground));
-    pointer-events: none;
-  }
-}
-
-/* Still tier: no WebGL, reduced motion or a weak phone. */
+/* Still: phones, tablets, reduced motion or no WebGL. No stage at all, and
+   the page carries itself on type, rules and space. */
 html[data-tier="still"] .gallery-stage {
   display: none;
 }
-html[data-tier="still"] .room-still {
+html[data-tier="still"] .room-proof {
   display: block;
-  position: absolute;
-  inset: 0;
-  overflow: clip;
 }
-html[data-tier="still"] .room-still::before {
-  content: "";
-  display: block;
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  background: var(--room-still) center / cover;
+html[data-tier="still"] .hero-name {
+  font-size: clamp(3rem, 13vw, 6rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
 }
-@media (max-width: 767px) {
-  html[data-tier="still"] .room-still {
-    inset: 3.5rem 0 auto;
-    height: calc(62svh - 3.5rem);
+
+/* Large screens: the number holds the side the form would take. */
+@media (min-width: 1024px) {
+  html[data-tier="still"] .room-proof {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    padding: 0 var(--gutter);
+    pointer-events: none;
   }
-  html[data-tier="still"] .room-entrance .room-still {
-    height: calc(44svh - 3.5rem);
+  html[data-tier="still"] .room[data-label="left"] .room-proof {
+    justify-content: flex-end;
   }
-  html[data-tier="still"] .room-still::before {
-    position: static;
-    height: 100%;
-    background: var(--room-still-phone) center / cover;
+  html[data-tier="still"] .proof {
+    position: sticky;
+    top: 42svh;
+    align-self: flex-start;
+    margin-top: 30svh;
   }
 }
 
-/* List view: one plain document, the same words and the same order. */
+/* Smaller screens: one column, each stop opened by its number and a rule. */
+@media (max-width: 1023px) {
+  html[data-tier="still"] .room {
+    align-items: stretch;
+    min-height: 0;
+    padding: 4rem var(--gutter);
+  }
+  html[data-tier="still"] .room:not(.room-entrance) {
+    border-top: 1px solid var(--rule);
+  }
+  html[data-tier="still"] .room-entrance {
+    min-height: 88svh;
+    padding-top: 6rem;
+  }
+  html[data-tier="still"] .room-proof {
+    margin-bottom: 2rem;
+  }
+  html[data-tier="still"] .plate {
+    width: min(100%, var(--plate-width));
+  }
+}
+
+/* List view, on the stage's devices only: one plain document, the same words
+   and the same order. */
 html[data-view="list"] .gallery-stage,
-html[data-view="list"] .room-still {
+html[data-view="list"] .room-proof {
   display: none;
 }
-html[data-view="list"] .room,
-html[data-view="list"] .room-entrance {
+html[data-view="list"]:not([data-tier="still"]) .room,
+html[data-view="list"]:not([data-tier="still"]) .room-entrance {
   display: block;
   min-height: 0;
   padding: 2.5rem var(--gutter) 0;
 }
-html[data-view="list"] .room:first-of-type {
+html[data-view="list"]:not([data-tier="still"]) .room:first-of-type {
   padding-top: 6.5rem;
 }
-html[data-view="list"] .plate::before,
-html[data-view="list"] .plate::after {
-  display: none;
-}
-html[data-view="list"] .plate {
+html[data-view="list"]:not([data-tier="still"]) .plate {
   width: min(100%, 46rem);
   margin-inline: auto;
   padding: 0 0 2.5rem;
-  background: none;
   border-bottom: 1px solid var(--rule);
+}
+html[data-tier="still"] .view-toggle {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

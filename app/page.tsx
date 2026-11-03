@@ -4,7 +4,7 @@ import { EntranceSection } from "@/components/entrance-section";
 import { ExperienceSection } from "@/components/experience-section";
 import { ProjectsSection } from "@/components/projects-section";
 import { SkillsSection } from "@/components/skills-section";
-import { AboutSection } from "@/components/about-section";
+import { AboutSection, AwardsSection } from "@/components/about-section";
 import { ContactSection } from "@/components/contact-section";
 import { Footer } from "@/components/footer";
 
@@ -21,6 +21,7 @@ export default function Portfolio() {
         <ProjectsSection />
         <SkillsSection />
         <AboutSection />
+        <AwardsSection />
         <ContactSection />
       </main>
       <Footer />

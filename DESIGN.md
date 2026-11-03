@@ -1,6 +1,6 @@
 ---
 name: Daniel Adegoke
-description: One form of molten copper particles rebuilds itself into each piece of the work as the visitor scrolls.
+description: One form of molten copper particles spells the name, then only numbers the words beside it prove, settling into dim dust in between.
 colors:
   copper: "#e8894f"
   amber: "#f6bc7a"
@@ -81,8 +81,8 @@ spacing:
   text-width: "31rem"
   text-width-wide: "43rem"
   list-width: "46rem"
-  stop-top: "7rem"
-  stop-bottom: "6rem"
+  stop-top: "5rem"
+  stop-bottom: "4rem"
 components:
   button-primary:
     backgroundColor: "{colors.copper}"
@@ -126,18 +126,18 @@ components:
 
 **Creative North Star: "Molten Copper"**
 
-The site is one body of matter. Tens of thousands of points of copper light hold a shape, pour out of it as the visitor scrolls, and settle into the next one: the name, the career, each project, the skills, the degree, and finally an @. There is only ever one form on screen, and it is always the same particles. Nothing is swapped, faded or replaced.
+The site is one body of matter. Tens of thousands of points of copper light hold a shape, pour out of it as the visitor scrolls, and settle into the next one. The form only ever spells two kinds of thing: the name, at the top, and a number that the words beside it prove (2020, 4,000+, TOP 5%, 3.81, 0.1%). Between numbers it loosens into dim dust behind the words. There are no pictures of the work. There is only ever one form on screen, and it is always the same particles.
 
 The form is the main event and the words are its plain counterpart. Text sits directly on the warm near-black ground, with no panel, card or tint behind it, and the form takes the space the text leaves free. Every word is server-rendered HTML, so a visitor reaches the facts without waiting on the form.
 
-The form is also one presentation of a plain document. The same words stand beside live particles, beside captured stills, or alone in a list view, and the system holds in all of them.
+The form runs only on large screens with a mouse or trackpad. Everywhere else the page is plain type on Ground, and the same numbers are set as Copper display type beside the words that prove them.
 
 **Key Characteristics:**
 - One form, one set of particles, rebuilt rather than replaced at each stop.
 - One colour family of copper, amber and ember glow on a warm near-black.
 - Text directly on the dark ground, with no panels or cards.
 - A form that answers the visitor: it parts round the cursor, bursts on a click, and streaks on a fast scroll.
-- Three rendering tiers and a list view, all carrying the same words.
+- Two rendering tiers and a list view, all carrying the same words.
 
 ## Colors
 
@@ -199,7 +199,7 @@ Schibsted Grotesk runs at 400, 500 and 600: 500 for button and link text, 600 fo
 
 ## Layout
 
-A fixed full-viewport stage sits behind a single scrolling column of stops. Each stop is at least 118svh tall, padded 7rem above and 6rem below, with the fluid gutter at the sides. The first stop is exactly 100svh with its words at the foot, 2.5rem from the bottom edge, and the name in particles across the full width in the upper part of the screen.
+A fixed full-viewport stage sits behind a single scrolling column of stops. Each stop is at least 75svh tall (Contact, the last, a full 100svh so the final rebuild can finish), padded 5rem above and 4rem below, with the fluid gutter at the sides. The first stop is exactly 100svh with its words at the foot, 2.5rem from the bottom edge, and the name in particles across the full width in the upper part of the screen.
 
 The text column sits on one side and the form takes the other, with the side set per stop in `lib/gallery.ts`. Columns are 31rem wide, or 43rem for the text-heavy Experience, Skills and About stops. The form's position and scale are computed from the width the text leaves free at the current screen size. The navigation bar is fixed and 56px tall, and scroll padding clears it by 4.5rem.
 
@@ -247,36 +247,36 @@ The words at each stop, set straight on the ground.
 - **Technologies:** Plain wrapped text in Quiet at Caption size, not chips.
 
 ### The Form
-The signature component: one point cloud, drawn with `react-three-fiber`, that takes a shape for each of the 11 stops. The shapes are generated in code and sampled in advance into one float texture, and the flow that carries the points is adapted from `liquid-logo`.
+The signature component: one point cloud, drawn with `react-three-fiber`, that takes a shape for each of the 12 stops. The shapes are generated in code and sampled in advance into one float texture, and the flow that carries the points is adapted from `liquid-logo`.
 
-- **Points:** 90,000 on Full and 25,600 on Phone, each a soft round light 0.6 to 1.4 times the base size. The first sixth are drawn again at seven times the size and very low alpha (0.07, or 0.035 on Phone), which stands in for a bloom pass at a fraction of the cost.
-- **Shapes:** The name, stepped slabs for Experience, a page with a line cut out of it for Uncooked, a curling bookmark, a raised grid of modules for Omniplexus, a pen nib for Inscribe, a gear for the Gear Library, nested rings for Wormhole, a ring of columns for Skills, the figure 3.81 for About, and an @ for Contact.
-- **At rest:** The surface creeps very slightly like molten metal, and the whole form sways slowly: barely on the name (0.06 radians), more on the later shapes (0.3 radians).
+- **Points:** 90,000, each a soft round light 0.6 to 1.4 times the base size. The first sixth are drawn again at seven times the size and very low alpha (0.07), which stands in for a bloom pass at a fraction of the cost.
+- **Shapes:** Three kinds only. The name at Top. A number at the stop whose words prove it: 2020 at Experience, 4,000+ at Inscribe, TOP 5% at Skills, 3.81 at About, 0.1% at Competitions. Dust at the five project stops without a number (Uncooked, Smart Bookmarks, Omniplexus, Gear Library, Wormhole) and at Contact. The numbers live in `proofs` in `lib/content.ts`, which the form and the plain page both read.
+- **Dust:** Points spread over the whole screen in a slab behind the words, at a fixed low shade and half brightness. Each wanders slowly on its own, like embers settling, and the next number rises out of it.
+- **At rest:** Letters creep very slightly like molten metal and hold still enough to read. The whole form sways slowly, from 0.06 radians on the name to 0.16 on later stops.
 - **Hold and rebuild:** The form holds its shape while the visitor reads, then rebuilds over the last 0.9 of a viewport before the next stop, on a smoothstep with damping at rate 5.
 - **Pour:** Points leave at different moments according to a per-point seed. In transit the form draws in by up to half, swirls round its vertical axis, and heats toward Ember Hot, so a shape pours into the next instead of fading or scattering.
 - **Cursor:** The form parts around a mouse pointer like a finger through liquid, and the points it touches heat up. Any pointer tilts the form slightly (up to 0.25 radians across, 0.15 down).
 - **Burst:** A click or tap on empty space throws the form apart from that spot, and it settles back on its own. Clicks on links, buttons, headings, paragraphs, list items and table cells are ignored, so selecting text never sets it off.
 - **Streak:** Fast scrolling stretches the points vertically into streaks, in proportion to scroll speed.
-- **Backdrop:** A slow `shadergradient` plane of Ground, Smoulder and Char, rendered off-screen at 384px on every third frame and dimmed. It runs on the Full tier only.
+- **Backdrop:** A slow `shadergradient` plane of Ground, Smoulder and Char, rendered off-screen at 384px on every third frame and dimmed.
 
 **The Same Matter Rule.** There is one form and one set of points. A new piece of the site is a new shape for those points, never a second object, model or scene.
 
-**The Real Shape Rule.** Every shape is generated from code and, where it shows a quantity, from real data. Experience slabs are as long as each role, Skills columns are as tall as each group, the gear is the same involute profile as the Gear Library, and 3.81 is the actual CGPA.
+**The Proof Only Rule.** The form never draws a picture of the work. It shows the name or a number, and every number must appear, with its meaning, in the words at the same stop. A project without a number gets dust, not an illustration.
 
-**The Readable Words Rule.** The form never competes with reading. On desktop it dims to 38% at the midpoint of a rebuild, the only time it reaches the words. On phones the words arrive on a solid Ground sheet with faded edges, so the form above them stays at full strength instead of dimming.
+**The Readable Words Rule.** The form never competes with reading. It dims to 38% at the midpoint of a rebuild, the only time it reaches the words, and dust stays at half brightness.
 
-The name, 3.81 and the @ use Archivo from the subset at `public/fonts/gallery-display.json`, which holds only the glyphs in use, so new letters in the form need a new subset.
+The name and numbers use Archivo Black from the subset at `public/fonts/gallery-display.json`: digits, A to Z, space and `% + . , @`. Numbers are set in capitals, so "Top 5%" draws as TOP 5%.
 
 ### Rendering Tiers
-How much of the form a device runs is decided at load, and every tier carries the same words.
-- **Full:** Desktop. 90,000 points, the backdrop, pixel ratio up to 1.5.
-- **Phone:** Coarse pointers and viewports below 768px. 25,600 points, no backdrop or glow layer, no click burst or scroll streaks, motion at 65% speed, no wormhole tunnel, the stacked name, and the form in the upper screen.
-- **Still:** No WebGL2, reduced motion, or a coarse pointer on a weak device (3GB memory or less, or 4 cores or fewer). The stage is removed, and each stop shows a captured image of its shape on the dark ground. There are 22 files in `public/rooms/`: one desktop and one phone capture per stop. On desktop the image stays sticky behind the words, and on phones it is a band under the navigation bar.
+Whether a device runs the form is decided before first paint and rechecked when the window or motion setting changes. Both tiers carry the same words.
+- **Full:** Viewports 1024px and wider with a fine pointer (mouse or trackpad), WebGL2, and no reduced-motion request. 90,000 points, the backdrop, pixel ratio up to 1.5.
+- **Still:** Everything else, including all phones and tablets. No canvas, and three.js is never downloaded. Each number is set as Copper Archivo 800 display type, up to 6rem, with a Caption line under it, `aria-hidden` because the words already state it. Below 1024px it opens its stop above the heading, the stops become one column divided by Rule lines, and the name is set large as the h1. At 1024px and wider it sits sticky on the side the form would take. The List view toggle is hidden, because the page is already plain.
 
 **The Shed Heaviest First Rule.** When frame rate declines, the form gives things up one at a time: pixel ratio drops to 1, then the backdrop goes, and only then does the site fall back to Still. A visitor never waits on an effect.
 
 ### List View
-One plain document on Ground, switched from the navigation bar and remembered between visits. It also opens from `?view=list`, and applies before first paint so the form never flashes. The stage and stills are hidden, the name appears as Display type, and the words become a centred 46rem column with a Rule line under each stop.
+One plain document on Ground, switched from the navigation bar on the Full tier and remembered between visits. It also opens from `?view=list`, and applies before first paint so the form never flashes. The stage and the set numbers are hidden, the name appears as Display type, and the words become a centred 46rem column with a Rule line under each stop.
 
 **The Same Words Rule.** Every presentation carries the same words in the same order. A fact never lives only in the form: the stage is `aria-hidden`, and nothing in it may be needed to understand the site.
 
@@ -284,13 +284,12 @@ One plain document on Ground, switched from the navigation bar and remembered be
 
 ### Do:
 - **Do** set reading text directly on Ground, in Text or Quiet.
-- **Do** build each new stop as a shape for the existing points, with an entry in `lib/gallery.ts`, a builder in `components/gallery/form-shapes.ts`, and a matching `data-stop` in the page.
-- **Do** derive a shape from real data wherever it shows a quantity.
+- **Do** add a new stop as an entry in `lib/gallery.ts` (with its form: name, figure or rest) and a matching `data-stop` in the page. A figure also needs an entry in `proofs` in `lib/content.ts`, stated in that stop's words.
+- **Do** rebuild the font subset when a number needs a glyph it lacks.
 - **Do** change Ground in `app/globals.css`, `app/layout.tsx`, the canvas, the backdrop and the icon and social images together, since each reads its own copy.
-- **Do** recapture both still images in `public/rooms/` whenever a shape or its layout changes.
-- **Do** keep models solid: light them live from their surface normals, hide faces turned away, and let a depth pass block what is behind.
-- **Do** keep the form away from words: dim it on desktop, and use the solid sheet on phones.
-- **Do** check every new surface in all three tiers and in list view.
+- **Do** keep letters solid: light them live from their surface normals, hide faces turned away, and let a depth pass block what is behind.
+- **Do** keep the form away from words: dim it during a rebuild, and keep dust dim.
+- **Do** check every new surface in both tiers, at phone width, and in list view.
 
 ### Don't:
 - **Don't** add a second hue, or a cool or pure neutral.
@@ -300,4 +299,5 @@ One plain document on Ground, switched from the navigation bar and remembered be
 - **Don't** add a CSS shadow or glow to an interface element.
 - **Don't** add a second 3D object beside the form, or let a shape fade or cut instead of pouring.
 - **Don't** let the burst fire from text or controls, or let the form hold a fact that the words do not.
-- **Don't** invent a shape's proportions when real data exists for it.
+- **Don't** bring back pictorial models (trains, pans, toolboxes). If a stop has no number worth stating, it gets dust.
+- **Don't** load the form on phones or tablets.

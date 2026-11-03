@@ -5,7 +5,7 @@ import { Canvas, createPortal, useFrame, useThree } from "@react-three/fiber";
 import { PerformanceMonitor, useFBO } from "@react-three/drei";
 import { ShaderGradient } from "@shadergradient/react";
 import * as THREE from "three";
-import { CAMERA_DISTANCE, CAMERA_FOV, formLayout, stops, walkPosition, type Tier } from "@/lib/gallery";
+import { CAMERA_DISTANCE, CAMERA_FOV, formLayout, stops, walkPosition, type Stop } from "@/lib/gallery";
 import { buildShapes } from "@/components/gallery/form-shapes";
 import { createFormMaterial } from "@/components/gallery/form-material";
 
@@ -68,11 +68,16 @@ function Backdrop({ enabled }: { enabled: boolean }) {
   );
 }
 
-type FormProps = { tier: Tier; tunnel: boolean; onTunnelEnd: () => void; onFallback: () => void; onReady: () => void };
+type FormProps = { tunnel: boolean; onTunnelEnd: () => void; onFallback: () => void; onReady: () => void };
 
-function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
-  const phone = tier === "phone";
-  const side = phone ? 160 : 300;
+const SIDE = 300;
+
+// Letters hold still enough to read; dust wanders and stays dim behind words.
+const restMotion = (stop: Stop) => (stop.form === "rest" ? 0.16 : stop.form === "name" ? 0.005 : 0.008);
+const brightness = (stop: Stop) => (stop.form === "rest" ? 0.5 : 1);
+
+function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
+  const side = SIDE;
   const size = useThree((state) => state.size);
   const setDpr = useThree((state) => state.setDpr);
   const { material, glow, depth } = useMemo(() => createFormMaterial(side), [side]);
@@ -124,7 +129,7 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
       textures.push(texture);
       return texture;
     };
-    buildShapes(side, phone, (data, normals) => {
+    buildShapes(side, (data, normals) => {
       if (cancelled) return;
       material.uniforms.uShapes.value = makeTexture(data);
       material.uniforms.uNormals.value = makeTexture(normals);
@@ -138,7 +143,7 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
       cancelled = true;
       for (const texture of textures) texture.dispose();
     };
-  }, [material, onReady, phone, side]);
+  }, [material, onReady, side]);
 
   useEffect(() => {
     const measure = () => {
@@ -162,7 +167,7 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     // A click or tap on empty space throws the form apart. Text and links keep
     // their normal behaviour, so selecting words never sets it off.
     const onClick = (event: MouseEvent) => {
-      if (phone || (event.target as Element).closest("a, button, h1, h2, h3, p, li, td, th")) return;
+      if ((event.target as Element).closest("a, button, h1, h2, h3, p, li, td, th")) return;
       toWorld(event.clientX, event.clientY, material.uniforms.uOrigin.value);
       burst.current = 1;
     };
@@ -173,7 +178,7 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
       window.removeEventListener("pointermove", onPointer);
       window.removeEventListener("click", onClick);
     };
-  }, [material, phone]);
+  }, [material]);
 
   useFrame((state, delta) => {
     const form = points.current;
@@ -190,12 +195,8 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     uniforms.uFrom.value = from;
     uniforms.uTo.value = to;
     uniforms.uMix.value = mix;
-    // Phones run everything slower, so a small screen stays calm.
-    uniforms.uTime.value += Math.min(delta, 0.05) * (phone ? 0.65 : 1);
-
-    // Fine detail has to hold still enough to read as a model.
-    const rest = (index: number) => (stops[index].id === "top" ? 0.005 : 0.012);
-    uniforms.uRest.value = THREE.MathUtils.lerp(rest(from), rest(to), mix);
+    uniforms.uTime.value += Math.min(delta, 0.05);
+    uniforms.uRest.value = THREE.MathUtils.lerp(restMotion(stops[from]), restMotion(stops[to]), mix);
 
     // Point sizes are in drawing pixels, so they follow the live pixel ratio.
     const ratio = state.gl.getPixelRatio();
@@ -203,16 +204,9 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     uniforms.uMaxSize.value = 8 * ratio;
     glow.uniforms.uSize.value = 147 * ratio;
     glow.uniforms.uMaxSize.value = 40 * ratio;
-    depth.uniforms.uSize.value = (phone ? 80 : 50) * ratio;
-    depth.uniforms.uMaxSize.value = (phone ? 26 : 18) * ratio;
+    depth.uniforms.uSize.value = 50 * ratio;
+    depth.uniforms.uMaxSize.value = 18 * ratio;
 
-    // The train's run down the track follows the scroll through Experience.
-    const start = anchors.current[1] ?? 0;
-    // On phones the words soon cover the screen, so the run happens before them.
-    const end = phone ? start + viewport * 0.42 : (anchors.current[2] ?? start + 1) - viewport * 0.9;
-    uniforms.uTrain.value = THREE.MathUtils.clamp((scroll - start) / Math.max(end - start, 1), 0, 1);
-
-    uniforms.uTurn.value = state.clock.elapsedTime * 0.22 + scroll * 0.0012;
     const wormhole = stops.findIndex((stop) => stop.id === "wormhole");
     // The tunnel only ever runs on request, and ends when the visitor leaves.
     const atWormhole = Math.abs(position.current - wormhole) < 0.6;
@@ -222,40 +216,38 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     }
     tunnelAmount.current = THREE.MathUtils.damp(tunnelAmount.current, tunnelGoal.current ? 1 : 0, 2.5, delta);
     uniforms.uTunnel.value = tunnelAmount.current < 0.002 ? 0 : tunnelAmount.current;
-    uniforms.uTunnelX.value = formLayout(stops[wormhole], size.width, size.height, phone).x;
-    uniforms.uClear.value = phone ? 0 : uniforms.uTunnel.value;
+    uniforms.uTunnelX.value = formLayout(stops[wormhole], size.width, size.height).x;
+    uniforms.uClear.value = uniforms.uTunnel.value;
     // The tunnel spreads the same particles over the whole screen.
     uniforms.uBoost.value = 1 + uniforms.uTunnel.value * 1.5;
 
-    const a = formLayout(stops[from], size.width, size.height, phone);
-    const b = formLayout(stops[to], size.width, size.height, phone);
+    const a = formLayout(stops[from], size.width, size.height);
+    const b = formLayout(stops[to], size.width, size.height);
     form.position.set(THREE.MathUtils.lerp(a.x, b.x, mix), THREE.MathUtils.lerp(a.y, b.y, mix), 0);
     form.scale.setScalar(THREE.MathUtils.lerp(a.scale, b.scale, mix));
-    // The train keeps to its track, straight down the screen.
-    const held = 1 - THREE.MathUtils.smoothstep(Math.abs(position.current - 1), 0.4, 1);
-    const sway = THREE.MathUtils.lerp(0.06, 0.3, THREE.MathUtils.smoothstep(position.current, 0, 1)) * (1 - held);
-    form.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * sway + tilt.current.x * 0.5 * (1 - held * 0.9);
-    form.rotation.x = tilt.current.y * 0.3 * (1 - held);
-    uniforms.uStraight.value = form.position.x * held;
+    // A slow sway and the pointer turn the form, never so far a number misreads.
+    const sway = THREE.MathUtils.lerp(0.06, 0.16, THREE.MathUtils.smoothstep(position.current, 0, 1));
+    form.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * sway + tilt.current.x * 0.35;
+    form.rotation.x = tilt.current.y * 0.22;
 
     const speed = (scroll - lastScroll.current) / Math.max(delta, 0.008) / 3000;
     lastScroll.current = scroll;
     velocity.current = THREE.MathUtils.damp(velocity.current, THREE.MathUtils.clamp(speed, -1, 1), 7, delta);
-    uniforms.uVelocity.value = phone ? 0 : velocity.current;
+    uniforms.uVelocity.value = velocity.current;
 
     burst.current = THREE.MathUtils.damp(burst.current, 0, 2.6, delta);
     uniforms.uBurst.value = burst.current;
     uniforms.uPointer.value.lerp(pointerGoal.current, 1 - Math.exp(-9 * delta));
 
-    // On desktop the form only reaches the words while it travels, so it steps
-    // back then. On phones the words slide over it on a solid sheet instead.
-    const dim = phone ? 1 : 1 - Math.sin(Math.PI * mix) * 0.62;
+    // The form only reaches the words while it travels, so it steps back then.
+    // Dust stays dim throughout, because it lies behind the words.
+    const dim = (1 - Math.sin(Math.PI * mix) * 0.62) * THREE.MathUtils.lerp(brightness(stops[from]), brightness(stops[to]), mix);
     uniforms.uDim.value = THREE.MathUtils.damp(uniforms.uDim.value, dim, 6, delta);
   });
 
   return (
     <>
-      <Backdrop enabled={tier === "full" && shed < 2} />
+      <Backdrop enabled={shed < 2} />
       <PerformanceMonitor
         bounds={() => [22, 55]}
         flipflops={Infinity}
@@ -270,7 +262,7 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
       {ready && (
         <group ref={points}>
           <points geometry={geometry} material={depth} frustumCulled={false} renderOrder={-1} />
-          {!phone && <points geometry={glowGeometry} material={glow} frustumCulled={false} />}
+          <points geometry={glowGeometry} material={glow} frustumCulled={false} />
           <points geometry={geometry} material={material} frustumCulled={false} />
         </group>
       )}
@@ -279,11 +271,10 @@ function Form({ tier, tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
 }
 
 export default function GalleryCanvas(props: FormProps) {
-  const { tier } = props;
   return (
     <Canvas
       camera={{ fov: CAMERA_FOV, position: [0, 0, CAMERA_DISTANCE], near: 0.1, far: 60 }}
-      dpr={tier === "phone" ? [1, 1.75] : [1, 1.5]}
+      dpr={[1, 1.5]}
       gl={{ antialias: false, powerPreference: "high-performance" }}
       style={{ pointerEvents: "none" }}
     >

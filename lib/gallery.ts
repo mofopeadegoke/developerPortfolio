@@ -7,38 +7,40 @@ export type Stop = {
   label: "left" | "right";
   /** Text column width in rem. */
   width: number;
+  /** The name, a number that proves something, or loose dust at rest. */
+  form: "name" | "figure" | "rest";
 };
 
 export const stops: Stop[] = [
-  { id: "top", label: "left", width: 31 },
-  { id: "experience", label: "right", width: 43 },
-  { id: "uncooked", label: "left", width: 31 },
-  { id: "smart-bookmarks", label: "right", width: 31 },
-  { id: "omniplexus", label: "left", width: 31 },
-  { id: "inscribe", label: "right", width: 31 },
-  { id: "gear", label: "left", width: 31 },
-  { id: "wormhole", label: "right", width: 31 },
-  { id: "skills", label: "right", width: 43 },
-  { id: "about", label: "left", width: 43 },
-  { id: "contact", label: "right", width: 31 },
+  { id: "top", label: "left", width: 31, form: "name" },
+  { id: "experience", label: "right", width: 43, form: "figure" },
+  { id: "uncooked", label: "left", width: 31, form: "rest" },
+  { id: "smart-bookmarks", label: "right", width: 31, form: "rest" },
+  { id: "omniplexus", label: "left", width: 31, form: "rest" },
+  { id: "inscribe", label: "right", width: 31, form: "figure" },
+  { id: "gear", label: "left", width: 31, form: "rest" },
+  { id: "wormhole", label: "right", width: 31, form: "rest" },
+  { id: "skills", label: "right", width: 43, form: "figure" },
+  { id: "about", label: "left", width: 43, form: "figure" },
+  { id: "awards", label: "right", width: 31, form: "figure" },
+  { id: "contact", label: "left", width: 31, form: "rest" },
 ];
 
 export const CAMERA_DISTANCE = 10;
 export const CAMERA_FOV = 35;
 
 /** Where the form sits at a stop, in the space the text leaves free. */
-export function formLayout(stop: Stop, width: number, height: number, phone: boolean) {
+export function formLayout(stop: Stop, width: number, height: number) {
   const visibleHeight = 2 * Math.tan((CAMERA_FOV / 2) * (Math.PI / 180)) * CAMERA_DISTANCE;
   const visibleWidth = visibleHeight * (width / height);
-  // The train and toolbox reach past the usual 2 units, so they sit smaller.
-  const fit = stop.id === "experience" || stop.id === "skills" ? 0.8 : 1;
-  if (phone) return { x: 0, y: visibleHeight * 0.24, scale: visibleWidth * (stop.id === "top" ? 0.42 : 0.38) * fit };
+  // Dust is spread over the whole screen, behind everything.
+  if (stop.form === "rest") return { x: 0, y: 0, scale: visibleHeight / 2 };
   if (stop.id === "top") return { x: 0, y: visibleHeight * 0.2, scale: Math.min(visibleWidth * 0.44, visibleHeight * 0.72) };
   const gutter = Math.max(16, Math.min(56, width * 0.04));
   const textEdge = stop.width * 16 + gutter;
   const free = visibleWidth * (1 - Math.min(0.62, textEdge / width));
   const x = ((visibleWidth - free) / 2) * (stop.label === "left" ? 1 : -1);
-  return { x, y: 0, scale: Math.min(free * 0.4, visibleHeight * 0.34) * fit };
+  return { x, y: 0, scale: Math.min(free * 0.4, visibleHeight * 0.34) };
 }
 
 /** Progress through the shapes, in stop units, from page scroll. */
@@ -55,25 +57,24 @@ export function walkPosition(scroll: number, anchors: number[], viewport: number
   return anchors.length - 1;
 }
 
-export type Tier = "full" | "phone" | "still";
+/** Full runs the form; Still is the plain page with no WebGL at all. */
+export type Tier = "full" | "still";
 
-/** Picks how much of the form this device should run. */
+/** The form only runs on a large screen driven by a mouse or trackpad. */
+export const STAGE_QUERY = "(min-width: 1024px) and (pointer: fine)";
+
+/** Picks whether this device runs the form. */
 export function detectTier(): Tier {
-  if (typeof window === "undefined") return "full";
+  if (typeof window === "undefined") return "still";
   const forced = new URLSearchParams(window.location.search).get("tier");
-  if (forced === "full" || forced === "phone" || forced === "still") return forced;
+  if (forced === "full" || forced === "still") return forced;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return "still";
+  if (!window.matchMedia(STAGE_QUERY).matches) return "still";
   try {
     const canvas = document.createElement("canvas");
     if (!canvas.getContext("webgl2")) return "still";
   } catch {
     return "still";
   }
-  const coarse = window.matchMedia("(pointer: coarse)").matches;
-  const nav = navigator as Navigator & { deviceMemory?: number };
-  // Only trust deviceMemory here. iPhones don't report it, and browsers can
-  // under-report core counts, so a capable phone must not lose the form.
-  // Weak devices that slip through are caught by the live performance monitor.
-  if (coarse && (nav.deviceMemory ?? 8) <= 3) return "still";
-  return coarse || window.innerWidth < 768 ? "phone" : "full";
+  return "full";
 }

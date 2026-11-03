@@ -20,9 +20,17 @@ export function AboutSection() {
       <p className="mt-1">{education.school}</p>
       <p className="text-quiet">Graduated {education.graduated}</p>
       <p className="mt-2 text-quiet">{education.standing}</p>
+    </Room>
+  );
+}
 
-      <h3 className="mt-9 font-display text-2xl font-bold">Competitions</h3>
-      <table className="mt-3 w-full text-left">
+export function AwardsSection() {
+  return (
+    <Room stop="awards" id="awards" aria-labelledby="awards-heading">
+      <h2 id="awards-heading" className="font-display text-4xl font-extrabold tracking-[-0.02em] [font-stretch:115%]">
+        Competitions
+      </h2>
+      <table className="mt-6 w-full text-left">
         <caption className="sr-only">Competition results</caption>
         <thead className="sr-only">
           <tr>

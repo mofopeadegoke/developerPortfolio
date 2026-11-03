@@ -36,7 +36,7 @@ export function Navigation() {
               </li>
             ))}
           </ul>
-          <button type="button" onClick={toggleView} className="py-2 text-[0.95rem] font-medium underline decoration-copper underline-offset-4 transition-colors hover:text-amber">
+          <button type="button" onClick={toggleView} className="view-toggle py-2 text-[0.95rem] font-medium underline decoration-copper underline-offset-4 transition-colors hover:text-amber">
             {viewLabel}
           </button>
           <LinkButton href={profile.resume} download={profile.resumeFileName} className="px-4 py-2 text-sm">
@@ -45,7 +45,7 @@ export function Navigation() {
         </div>
 
         <div className="flex items-center gap-3 lg:hidden">
-          <button type="button" onClick={toggleView} className="py-2 text-sm font-medium underline decoration-copper underline-offset-4">
+          <button type="button" onClick={toggleView} className="view-toggle py-2 text-sm font-medium underline decoration-copper underline-offset-4">
             {viewLabel}
           </button>
           <button

@@ -16,8 +16,9 @@ const schibsted = Schibsted_Grotesk({
   variable: "--font-schibsted",
 });
 
-// Applied before first paint so list-view visitors never see the gallery flash.
-const viewScript = `try{var v=new URLSearchParams(location.search).get("view")||localStorage.getItem("gallery-view");if(v==="list")document.documentElement.dataset.view="list"}catch(e){}`;
+// Applied before first paint, so list-view visitors never see the gallery flash
+// and phones lay out as the plain page from the first frame.
+const viewScript = `try{var d=document.documentElement,q=new URLSearchParams(location.search),v=q.get("view")||localStorage.getItem("gallery-view");if(v==="list")d.dataset.view="list";if(q.get("tier")!=="full"&&(matchMedia("(prefers-reduced-motion: reduce)").matches||!matchMedia("(min-width: 1024px) and (pointer: fine)").matches))d.dataset.tier="still"}catch(e){}`;
 
 const description =
   "Software Engineer in Famagusta, Cyprus. Frontend architecture in React, React Native and TypeScript, full-stack apps with Next.js, PostgreSQL and the Claude API, and C++ systems work. Open to relocation across Europe or remote.";

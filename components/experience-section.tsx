@@ -1,5 +1,5 @@
 import { Room } from "@/components/room";
-import { experience } from "@/lib/content";
+import { codingSince, experience } from "@/lib/content";
 
 export function ExperienceSection() {
   return (
@@ -7,6 +7,7 @@ export function ExperienceSection() {
       <h2 id="experience-heading" className="font-display text-4xl font-extrabold tracking-[-0.02em] [font-stretch:115%]">
         Experience
       </h2>
+      <p className="mt-3 text-quiet">{codingSince}</p>
       <ol className="mt-8 space-y-10">
         {experience.map((job) => (
           <li key={`${job.company}-${job.start}`}>

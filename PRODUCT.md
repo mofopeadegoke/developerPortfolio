@@ -29,7 +29,8 @@ A recent software engineering graduate who owned frontend architecture for produ
 
 - The involute gear is no longer the site's identity. A gear appears only as the Gear Library project's own exhibit.
 - The theme is one colour family, Molten Copper, on near-black. Several bright, contrasting colours were rejected by the user.
-- 3D must be the main event and respond to the visitor, not decoration beside the content.
+- 3D must be the main event on desktop and respond to the visitor, not decoration beside the content. It shows only the name and numbers the page proves (2020, 4,000+, top 5%, 3.81, 0.1%), never pictures of the work.
+- Phones and tablets get no 3D at all: a clean, fast page with the same numbers set as type.
 - The visual materials come from react-three-fiber, shadergradient and liquid-logo. liquid-glass-js is not used in this direction.
 
 ## Evidence on Hand
@@ -44,4 +45,4 @@ Project links, install counts, competition results and test figures in `lib/cont
 
 ## Accessibility & Inclusion
 
-Content must stay readable without WebGL. Effects fall back when WebGL is unavailable or reduced motion is requested, and run on phones only where they stay smooth.
+Content must stay readable without WebGL. The form runs only at 1024px and wider with a mouse or trackpad, and never when WebGL2 is missing or reduced motion is requested.
