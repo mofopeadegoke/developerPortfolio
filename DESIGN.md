@@ -1,6 +1,6 @@
 ---
 name: Daniel Adegoke
-description: One form of molten copper particles spells the name, then only numbers the words beside it prove, settling into dim dust in between.
+description: One form of molten copper particles spells the name, then only numbers the words beside it prove, scattering into silver stars in between.
 colors:
   copper: "#e8894f"
   amber: "#f6bc7a"
@@ -10,6 +10,7 @@ colors:
   ground: "#0b0807"
   char: "#1a0c07"
   smoulder: "#4a1a0a"
+  silver: "#dfe3ea"
   rule: "#33261e"
   quiet: "#bcaea2"
   text: "#f4ece4"
@@ -126,7 +127,7 @@ components:
 
 **Creative North Star: "Molten Copper"**
 
-The site is one body of matter. Tens of thousands of points of copper light hold a shape, pour out of it as the visitor scrolls, and settle into the next one. The form only ever spells two kinds of thing: the name, at the top, and a number that the words beside it prove (2020, 4,000+, TOP 5%, 3.81, 0.1%). Between numbers it loosens into dim dust behind the words. There are no pictures of the work. There is only ever one form on screen, and it is always the same particles.
+The site is one body of matter. Tens of thousands of points of copper light hold a shape, pour out of it as the visitor scrolls, and settle into the next one. The form only ever spells two kinds of thing: the name, at the top, and a number that the words beside it prove (2020, 4,000+, TOP 5%, 3.81, 0.1%). Between numbers it scatters into a sparse field of twinkling silver stars behind the words. There are no pictures of the work. There is only ever one form on screen, and it is always the same particles.
 
 The form is the main event and the words are its plain counterpart. Text sits directly on the warm near-black ground, with no panel, card or tint behind it, and the form takes the space the text leaves free. Every word is server-rendered HTML, so a visitor reaches the facts without waiting on the form.
 
@@ -134,14 +135,14 @@ The form runs only on large screens with a mouse or trackpad. Everywhere else th
 
 **Key Characteristics:**
 - One form, one set of particles, rebuilt rather than replaced at each stop.
-- One colour family of copper, amber and ember glow on a warm near-black.
+- One colour family of copper, amber and ember glow on a warm near-black, with silver kept for stars alone.
 - Text directly on the dark ground, with no panels or cards.
-- A form that answers the visitor: it parts round the cursor and bursts on a click.
+- A form that answers the visitor: it parts round the cursor, bursts on a click, and streaks slightly on a fast scroll.
 - Two rendering tiers and a list view, all carrying the same words.
 
 ## Colors
 
-A single warm hue runs from near-black through ember and copper to a pale hot amber, and every colour on the site belongs to it.
+A single warm hue runs from near-black through ember and copper to a pale hot amber, and every colour on the site belongs to it except Silver, which belongs only to stars.
 
 ### Primary
 - **Copper** (#e8894f): The colour of action. It fills the solid button, borders the outline buttons, and underlines text links. It also draws the dashes in lists, the scrollbar thumb, and the text selection. It reaches 7.72:1 on Ground in either direction, so Ground text on a copper fill is safe.
@@ -153,6 +154,7 @@ A single warm hue runs from near-black through ember and copper to a pale hot am
 - **Ember Deep** (#80210a): The shadowed side of the form, where a point faces away from the light.
 - **Ember Bright** (#ff8533): The lit body of the form.
 - **Ember Hot** (#ffdb9e): The brightest points of the form, and the colour points move toward as they heat up in transit or near the cursor.
+- **Silver** (#dfe3ea): Stars only: the form between numbers, the wormhole's streaks, and the CSS starfield on the Still tier and in list view. Warmed slightly so it sits on Ground. Never used in the interface.
 
 These three live only in the particle shader. They never appear in the interface.
 
@@ -164,7 +166,7 @@ These three live only in the particle shader. They never appear in the interface
 - **Text** (#f4ece4): Primary reading text, a warm off-white. 17.08:1 on Ground.
 
 ### Named Rules
-**The One Family Rule.** Every colour sits in the copper family on near-black. A second hue is a system change, not an accent. The neutrals are warm for the same reason: there is no pure white, pure black or cool grey anywhere.
+**The One Family Rule.** Every colour sits in the copper family on near-black, with one exception: Silver, which is for stars and nothing else. Copper is the work; silver is the space between. Any other hue is a system change, not an accent. The neutrals are warm for the same reason: there is no pure white, pure black or cool grey anywhere.
 
 **The Amber Answer Rule.** Amber in the interface only ever answers the visitor: hover and focus, never a resting state. If nothing is being pointed at or focused, no amber shows outside the form.
 
@@ -250,28 +252,29 @@ The words at each stop, set straight on the ground.
 The signature component: one point cloud, drawn with `react-three-fiber`, that takes a shape for each of the 12 stops. The shapes are generated in code and sampled in advance into one float texture, and the flow that carries the points is adapted from `liquid-logo`.
 
 - **Points:** 90,000, each a soft round light 0.6 to 1.4 times the base size. The first sixth are drawn again at seven times the size and very low alpha (0.07), which stands in for a bloom pass at a fraction of the cost.
-- **Shapes:** Three kinds only. The name at Top. A number at the stop whose words prove it: 2020 at Experience, 4,000+ at Inscribe, TOP 5% at Skills, 3.81 at About, 0.1% at Competitions. Dust at the five project stops without a number (Uncooked, Smart Bookmarks, Omniplexus, Gear Library, Wormhole) and at Contact. The numbers live in `proofs` in `lib/content.ts`, which the form and the plain page both read.
-- **Dust:** Points spread over the whole screen in a slab behind the words, at a fixed low shade and half brightness. Each wanders slowly on its own, like embers settling, and the next number rises out of it.
+- **Shapes:** Three kinds only. The name at Top. A number at the stop whose words prove it: 2020 at Experience, 4,000+ at Inscribe, TOP 5% at Skills, 3.81 at About, 0.1% at Competitions. Stars at the five project stops without a number (Uncooked, Smart Bookmarks, Omniplexus, Gear Library, Wormhole) and at Contact. The numbers live in `proofs` in `lib/content.ts`, which the form and the plain page both read.
+- **Stars:** Between numbers about one point in 45 (roughly 2,000) stays lit as a silver star, spread over the whole screen in a slab behind the words; the rest fade out and pour back in to build the next number. Points turn from copper to silver gradually as they travel. Stars never wander or sway. They sit at different depths, so scrolling slides near stars further than far ones (`DRIFT`), wrapping round off screen. Each pulses on its own two-to-five-second cycle, and about one in 25 flashes a four-armed glint at its peak. Behind the text column stars drop to 35% and never glint. They skip the warm halo pass.
 - **At rest:** Letters creep very slightly like molten metal and hold still enough to read. The whole form sways slowly, from 0.06 radians on the name to 0.16 on later stops.
-- **Hold and rebuild:** The form holds its shape while the visitor reads, then rebuilds over the last 0.9 of a viewport before the next stop, on a smoothstep with damping at rate 5.
+- **Hold and rebuild:** A shape is complete when its stop's text block is centred on screen. It holds while the visitor reads, then rebuilds over the last half viewport before the next stop, on a smoothstep followed by a critically damped spring (`FOLLOW_TIME`, 0.05s) that never overshoots.
 - **Pour:** Points leave at different moments according to a per-point seed. In transit the form draws in by up to half, swirls round its vertical axis, and heats toward Ember Hot, so a shape pours into the next instead of fading or scattering.
 - **Cursor:** The form parts around a mouse pointer like a finger through liquid, and the points it touches heat up. Any pointer tilts the form slightly (up to 0.25 radians across, 0.15 down).
 - **Burst:** A click or tap on empty space throws the form apart from that spot, and it settles back on its own. Clicks on links, buttons, headings, paragraphs, list items and table cells are ignored, so selecting text never sets it off.
-- **Scroll:** Scrolling never blurs or stretches the form. It follows the scroll closely and stays sharp at any speed.
-- **Backdrop:** A slow `shadergradient` plane of Ground, Smoulder and Char, rendered off-screen at 384px on every third frame and dimmed.
+- **Streak:** Fast scrolling stretches the points slightly into streaks, in proportion to scroll speed, at a quarter of full strength (`STREAK`).
+- **Backdrop:** A slow `shadergradient` plane of Ground, Smoulder and Char, rendered off-screen at 384px on every third frame and dimmed heavily, so the stars have dark space to stand out on.
+- **Wormhole:** On request the particles open into a tunnel of silver star streaks that flies past the viewer.
 
 **The Same Matter Rule.** There is one form and one set of points. A new piece of the site is a new shape for those points, never a second object, model or scene.
 
 **The Proof Only Rule.** The form never draws a picture of the work. It shows the name or a number, and every number must appear, with its meaning, in the words at the same stop. A project without a number gets dust, not an illustration.
 
-**The Readable Words Rule.** The form never competes with reading. It dims to 38% at the midpoint of a rebuild, the only time it reaches the words, and dust stays at half brightness.
+**The Readable Words Rule.** The form never competes with reading. It dims to 38% at the midpoint of a rebuild, the only time it reaches the words, and stars drop to 35% behind the text column and never glint there.
 
 The name and numbers use Archivo Black from the subset at `public/fonts/gallery-display.json`: digits, A to Z, space and `% + . , @`. Numbers are set in capitals, so "Top 5%" draws as TOP 5%.
 
 ### Rendering Tiers
 Whether a device runs the form is decided before first paint and rechecked when the window or motion setting changes. Both tiers carry the same words.
 - **Full:** Viewports 1024px and wider with a fine pointer (mouse or trackpad), WebGL2, and no reduced-motion request. 90,000 points, the backdrop, pixel ratio up to 1.5.
-- **Still:** Everything else, including all phones and tablets. No canvas, and three.js is never downloaded. Each number is set as Copper Archivo 800 display type, up to 6rem, with a Caption line under it, `aria-hidden` because the words already state it. Below 1024px it opens its stop above the heading, the stops become one column divided by Rule lines, and the name is set large as the h1. At 1024px and wider it sits sticky on the side the form would take. The List view toggle is hidden, because the page is already plain.
+- **Still:** Everything else, including all phones and tablets. No canvas, and three.js is never downloaded. Each number is set as Copper Archivo 800 display type, up to 6rem, with a Caption line under it, `aria-hidden` because the words already state it. Below 1024px it opens its stop above the heading, the stops become one column divided by Rule lines, and the name is set large as the h1. At 1024px and wider it sits sticky on the side the form would take. The List view toggle is hidden, because the page is already plain. Forty fixed silver points twinkle behind the page (`components/starfield.tsx`), peaking at 45% with no glints, the same as in list view; they are hidden for reduced motion.
 
 **The Shed Heaviest First Rule.** When frame rate declines, the form gives things up one at a time: pixel ratio drops to 1, then the backdrop goes, and only then does the site fall back to Still. A visitor never waits on an effect.
 
@@ -288,16 +291,16 @@ One plain document on Ground, switched from the navigation bar on the Full tier 
 - **Do** rebuild the font subset when a number needs a glyph it lacks.
 - **Do** change Ground in `app/globals.css`, `app/layout.tsx`, the canvas, the backdrop and the icon and social images together, since each reads its own copy.
 - **Do** keep letters solid: light them live from their surface normals, hide faces turned away, and let a depth pass block what is behind.
-- **Do** keep the form away from words: dim it during a rebuild, and keep dust dim.
+- **Do** keep the form away from words: dim it during a rebuild, and keep stars dim behind the text column.
 - **Do** check every new surface in both tiers, at phone width, and in list view.
 
 ### Don't:
-- **Don't** add a second hue, or a cool or pure neutral.
+- **Don't** add another hue, or use Silver for anything but stars, or a cool or pure neutral.
 - **Don't** put reading text on a panel, card, tint or blur.
 - **Don't** use Amber in the interface for a resting state, or the ember colours in the interface at all.
 - **Don't** round a button or any other interface element.
 - **Don't** add a CSS shadow or glow to an interface element.
 - **Don't** add a second 3D object beside the form, or let a shape fade or cut instead of pouring.
 - **Don't** let the burst fire from text or controls, or let the form hold a fact that the words do not.
-- **Don't** bring back pictorial models (trains, pans, toolboxes). If a stop has no number worth stating, it gets dust.
+- **Don't** bring back pictorial models (trains, pans, toolboxes). If a stop has no number worth stating, it gets stars.
 - **Don't** load the form on phones or tablets.

@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { detectTier, STAGE_QUERY, type Tier } from "@/lib/gallery";
+import { Starfield } from "@/components/starfield";
 
 // The page's words are all server-rendered; the 3D stage only ever sits behind
 // them, so it loads after the content and nobody waits for it.
@@ -85,6 +86,7 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
       <div aria-hidden="true" className="gallery-stage" data-ready={ready || undefined}>
         {showCanvas && <GalleryCanvas tunnel={tunnel} onTunnelEnd={endTunnel} onFallback={fallBack} onReady={markReady} />}
       </div>
+      <Starfield />
       {children}
     </GalleryContext.Provider>
   );

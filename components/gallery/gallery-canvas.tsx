@@ -5,7 +5,7 @@ import { Canvas, createPortal, useFrame, useThree } from "@react-three/fiber";
 import { PerformanceMonitor, useFBO } from "@react-three/drei";
 import { ShaderGradient } from "@shadergradient/react";
 import * as THREE from "three";
-import { CAMERA_DISTANCE, CAMERA_FOV, formLayout, stops, walkPosition, type Stop } from "@/lib/gallery";
+import { CAMERA_DISTANCE, CAMERA_FOV, formLayout, stops, textBand, walkPosition, type Stop } from "@/lib/gallery";
 import { buildShapes } from "@/components/gallery/form-shapes";
 import { createFormMaterial } from "@/components/gallery/form-material";
 
@@ -62,7 +62,7 @@ function Backdrop({ enabled }: { enabled: boolean }) {
       )}
       <mesh position={[0, 0, -7]}>
         <planeGeometry args={[34, 20]} />
-        <meshBasicMaterial map={target.texture} color="#3a3a3a" toneMapped={false} />
+        <meshBasicMaterial map={target.texture} color="#262626" toneMapped={false} />
       </mesh>
     </>
   );
@@ -72,9 +72,13 @@ type FormProps = { tunnel: boolean; onTunnelEnd: () => void; onFallback: () => v
 
 const SIDE = 300;
 
-// Letters hold still enough to read; dust wanders and stays dim behind words.
-const restMotion = (stop: Stop) => (stop.form === "rest" ? 0.16 : stop.form === "name" ? 0.005 : 0.008);
-const brightness = (stop: Stop) => (stop.form === "rest" ? 0.5 : 1);
+// Letters hold still enough to read, and stars hold still entirely.
+const restMotion = (stop: Stop) => (stop.form === "rest" ? 0 : stop.form === "name" ? 0.005 : 0.008);
+// How far the nearest stars slide per screen scrolled, in the dust's own units.
+const DRIFT = 0.12;
+
+// How strongly fast scrolling stretches the points into streaks; 1 is the original strength.
+const STREAK = 0.25;
 
 // How long the form takes to catch up with the scroll, in seconds.
 const FOLLOW_TIME = 0.05;
@@ -114,6 +118,8 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
 
   const points = useRef<THREE.Group>(null);
   const anchors = useRef<number[]>([]);
+  const lastScroll = useRef(0);
+  const velocity = useRef(0);
   const position = useRef(0);
   const positionVelocity = useRef(0);
   const burst = useRef(0);
@@ -174,14 +180,23 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
 
   useEffect(() => {
     const measure = () => {
+      // A shape is complete when its section's words sit in the middle of the
+      // screen, never past the ends of the page and always in page order.
+      const viewport = window.innerHeight;
+      const end = Math.max(0, document.documentElement.scrollHeight - viewport);
+      let previous = 0;
       anchors.current = stops.map((stop) => {
-        const element = document.querySelector(`[data-stop="${stop.id}"]`);
-        return element ? element.getBoundingClientRect().top + window.scrollY : 0;
+        const section = document.querySelector(`[data-stop="${stop.id}"]`);
+        const box = (section?.querySelector(".plate") ?? section)?.getBoundingClientRect();
+        const middle = box ? box.top + box.height / 2 + window.scrollY - viewport / 2 : 0;
+        previous = Math.max(previous, Math.min(end, middle));
+        return previous;
       });
     };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(document.body);
+    window.addEventListener("resize", measure);
 
     const toWorld = (clientX: number, clientY: number, out: THREE.Vector3) => {
       const height = 2 * Math.tan((CAMERA_FOV / 2) * (Math.PI / 180)) * CAMERA_DISTANCE;
@@ -202,6 +217,7 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     window.addEventListener("click", onClick);
     return () => {
       observer.disconnect();
+      window.removeEventListener("resize", measure);
       window.removeEventListener("pointermove", onPointer);
       window.removeEventListener("click", onClick);
     };
@@ -224,6 +240,12 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     uniforms.uMix.value = mix;
     uniforms.uTime.value += Math.min(delta, 0.05);
     uniforms.uRest.value = THREE.MathUtils.lerp(restMotion(stops[from]), restMotion(stops[to]), mix);
+    uniforms.uDrift.value = (scroll / viewport) * DRIFT;
+    // Stars dim where the words are.
+    const bandFrom = textBand(stops[from], size.width);
+    const bandTo = textBand(stops[to], size.width);
+    uniforms.uTextMin.value = THREE.MathUtils.lerp(bandFrom.min, bandTo.min, mix);
+    uniforms.uTextMax.value = THREE.MathUtils.lerp(bandFrom.max, bandTo.max, mix);
 
     // Point sizes are in drawing pixels, so they follow the live pixel ratio.
     const ratio = state.gl.getPixelRatio();
@@ -253,17 +275,24 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     form.position.set(THREE.MathUtils.lerp(a.x, b.x, mix), THREE.MathUtils.lerp(a.y, b.y, mix), 0);
     form.scale.setScalar(THREE.MathUtils.lerp(a.scale, b.scale, mix));
     // A slow sway and the pointer turn the form, never so far a number misreads.
-    const sway = THREE.MathUtils.lerp(0.06, 0.16, THREE.MathUtils.smoothstep(position.current, 0, 1));
+    // Stars never sway, so the sky holds still.
+    const starry = THREE.MathUtils.lerp(stops[from].form === "rest" ? 1 : 0, stops[to].form === "rest" ? 1 : 0, mix);
+    const sway = THREE.MathUtils.lerp(0.06, 0.16, THREE.MathUtils.smoothstep(position.current, 0, 1)) * (1 - starry);
     form.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * sway + tilt.current.x * 0.35;
     form.rotation.x = tilt.current.y * 0.22;
+
+    const speed = (scroll - lastScroll.current) / Math.max(delta, 0.008) / 3000;
+    lastScroll.current = scroll;
+    velocity.current = THREE.MathUtils.damp(velocity.current, THREE.MathUtils.clamp(speed, -1, 1), 7, delta);
+    uniforms.uVelocity.value = velocity.current * STREAK;
 
     burst.current = THREE.MathUtils.damp(burst.current, 0, 2.6, delta);
     uniforms.uBurst.value = burst.current;
     uniforms.uPointer.value.lerp(pointerGoal.current, 1 - Math.exp(-9 * delta));
 
     // The form only reaches the words while it travels, so it steps back then.
-    // Dust stays dim throughout, because it lies behind the words.
-    const dim = (1 - Math.sin(Math.PI * mix) * 0.62) * THREE.MathUtils.lerp(brightness(stops[from]), brightness(stops[to]), mix);
+    // Stars dim themselves where they lie behind the words.
+    const dim = 1 - Math.sin(Math.PI * mix) * 0.62;
     uniforms.uDim.value = THREE.MathUtils.damp(uniforms.uDim.value, dim, 6, delta);
   });
 

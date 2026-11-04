@@ -5,6 +5,7 @@
   --text: #f4ece4;
   --quiet: #bcaea2;
   --rule: #33261e;
+  --silver: #dfe3ea;
   --copper: #e8894f;
   --amber: #f6bc7a;
   --plate-width: 31rem;
@@ -167,6 +168,31 @@ html[data-tier="still"] .hero-name {
   letter-spacing: -0.03em;
 }
 
+/* Wherever the form does not run, a few silver stars twinkle behind the page. */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: none;
+  pointer-events: none;
+}
+html[data-tier="still"] .starfield,
+html[data-view="list"] .starfield {
+  display: block;
+}
+.starfield > span {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--silver);
+  opacity: 0.08;
+  animation: twinkle 3s ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  to {
+    opacity: 0.45;
+  }
+}
+
 /* Large screens: the number holds the side the form would take. */
 @media (min-width: 1024px) {
   html[data-tier="still"] .room-proof {
@@ -240,5 +266,9 @@ html[data-tier="still"] .view-toggle {
   }
   .gallery-stage {
     transition: none;
+  }
+  html[data-tier] .starfield,
+  html[data-view] .starfield {
+    display: none;
   }
 }

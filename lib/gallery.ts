@@ -29,6 +29,17 @@ export const stops: Stop[] = [
 export const CAMERA_DISTANCE = 10;
 export const CAMERA_FOV = 35;
 
+/** How far the text column reaches in from its side of the screen, in pixels. */
+function textEdge(stop: Stop, width: number) {
+  return stop.width * 16 + Math.max(16, Math.min(56, width * 0.04));
+}
+
+/** The text column across the screen, from -1 at the left edge to 1 at the right. */
+export function textBand(stop: Stop, width: number) {
+  const reach = Math.min(2, (2 * textEdge(stop, width)) / width);
+  return stop.label === "left" ? { min: -1, max: -1 + reach } : { min: 1 - reach, max: 1 };
+}
+
 /** Where the form sits at a stop, in the space the text leaves free. */
 export function formLayout(stop: Stop, width: number, height: number) {
   const visibleHeight = 2 * Math.tan((CAMERA_FOV / 2) * (Math.PI / 180)) * CAMERA_DISTANCE;
@@ -36,9 +47,7 @@ export function formLayout(stop: Stop, width: number, height: number) {
   // Dust is spread over the whole screen, behind everything.
   if (stop.form === "rest") return { x: 0, y: 0, scale: visibleHeight / 2 };
   if (stop.id === "top") return { x: 0, y: visibleHeight * 0.2, scale: Math.min(visibleWidth * 0.44, visibleHeight * 0.72) };
-  const gutter = Math.max(16, Math.min(56, width * 0.04));
-  const textEdge = stop.width * 16 + gutter;
-  const free = visibleWidth * (1 - Math.min(0.62, textEdge / width));
+  const free = visibleWidth * (1 - Math.min(0.62, textEdge(stop, width) / width));
   const x = ((visibleWidth - free) / 2) * (stop.label === "left" ? 1 : -1);
   return { x, y: 0, scale: Math.min(free * 0.4, visibleHeight * 0.34) };
 }
@@ -51,7 +60,7 @@ export function walkPosition(scroll: number, anchors: number[], viewport: number
     if (scroll >= next) continue;
     // Hold the shape while reading, then rebuild during the last half viewport.
     const moveStart = Math.max(anchors[i], next - viewport * 0.5);
-    const t = Math.min(1, Math.max(0, (scroll - moveStart) / (next - moveStart)));
+    const t = next > moveStart ? Math.min(1, Math.max(0, (scroll - moveStart) / (next - moveStart))) : 1;
     return i + t * t * (3 - 2 * t);
   }
   return anchors.length - 1;
