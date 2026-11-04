@@ -25,6 +25,8 @@ const vertexShader = /* glsl */ `
 
   // About one point in 45 stays lit as a star; the rest fade out between numbers.
   const float STARS = 0.022;
+  // The share of points that fly as streaks through the wormhole.
+  const float TUNNEL_STARS = 0.15;
 
   vec2 liquidFlow(vec3 p, float t) {
     vec2 v = p.xy * 1.15 + p.z * 0.6;
@@ -119,6 +121,7 @@ const vertexShader = /* glsl */ `
     float lit = step(fract(aSeed * 137.13), STARS);
     float star = max(rest * mix(1.0, lit, 1.0 - uTunnel), uTunnel);
     fade *= mix(1.0, lit, rest * (1.0 - uTunnel));
+    fade *= mix(1.0, step(fract(aSeed * 17.17), TUNNEL_STARS), uTunnel);
 
     vec4 view = viewMatrix * world;
     // The depth pass sits just behind the surface, so the front of a model

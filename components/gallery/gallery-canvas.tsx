@@ -181,15 +181,20 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
   useEffect(() => {
     const measure = () => {
       // A shape is complete when its section's words sit in the middle of the
-      // screen, never past the ends of the page and always in page order.
+      // screen, or, for words taller than the screen, as the section arrives
+      // under the navigation bar, where its link scrolls to. Never past the
+      // ends of the page and always in page order.
       const viewport = window.innerHeight;
       const end = Math.max(0, document.documentElement.scrollHeight - viewport);
+      const navigation = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
       let previous = 0;
       anchors.current = stops.map((stop) => {
         const section = document.querySelector(`[data-stop="${stop.id}"]`);
-        const box = (section?.querySelector(".plate") ?? section)?.getBoundingClientRect();
-        const middle = box ? box.top + box.height / 2 + window.scrollY - viewport / 2 : 0;
-        previous = Math.max(previous, Math.min(end, middle));
+        if (!section) return previous;
+        const box = (section.querySelector(".plate") ?? section).getBoundingClientRect();
+        const middle = box.top + box.height / 2 + window.scrollY - viewport / 2;
+        const arrival = section.getBoundingClientRect().top + window.scrollY - navigation;
+        previous = Math.max(previous, Math.min(end, middle, arrival));
         return previous;
       });
     };
