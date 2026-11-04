@@ -77,7 +77,7 @@ const restMotion = (stop: Stop) => (stop.form === "rest" ? 0.16 : stop.form === 
 const brightness = (stop: Stop) => (stop.form === "rest" ? 0.5 : 1);
 
 // How long the form takes to catch up with the scroll, in seconds.
-const FOLLOW_TIME = 0.12;
+const FOLLOW_TIME = 0.05;
 
 /**
  * A critically damped spring towards the goal. Unlike an exponential chase it

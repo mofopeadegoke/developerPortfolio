@@ -49,8 +49,8 @@ export function walkPosition(scroll: number, anchors: number[], viewport: number
   for (let i = 0; i < anchors.length - 1; i++) {
     const next = anchors[i + 1];
     if (scroll >= next) continue;
-    // Hold the shape while reading, then rebuild during the last viewport.
-    const moveStart = Math.max(anchors[i], next - viewport * 0.9);
+    // Hold the shape while reading, then rebuild during the last half viewport.
+    const moveStart = Math.max(anchors[i], next - viewport * 0.5);
     const t = Math.min(1, Math.max(0, (scroll - moveStart) / (next - moveStart)));
     return i + t * t * (3 - 2 * t);
   }
