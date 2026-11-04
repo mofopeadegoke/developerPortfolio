@@ -76,6 +76,34 @@ const SIDE = 300;
 const restMotion = (stop: Stop) => (stop.form === "rest" ? 0.16 : stop.form === "name" ? 0.005 : 0.008);
 const brightness = (stop: Stop) => (stop.form === "rest" ? 0.5 : 1);
 
+// How long the form takes to catch up with the scroll, in seconds.
+const FOLLOW_TIME = 0.12;
+
+/**
+ * A critically damped spring towards the goal. Unlike an exponential chase it
+ * carries velocity, so it eases in and out and settles without a long crawl.
+ */
+function follow(current: number, goal: number, velocity: { current: number }, delta: number) {
+  const dt = Math.min(delta, 0.1);
+  const omega = 2 / FOLLOW_TIME;
+  const x = omega * dt;
+  const decay = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
+  const change = current - goal;
+  const temp = (velocity.current + omega * change) * dt;
+  velocity.current = (velocity.current - omega * temp) * decay;
+  let next = goal + (change + temp) * decay;
+  // Never overshoot, so a number never swings past its stop and back.
+  if (goal - current > 0 === next > goal) {
+    next = goal;
+    velocity.current = 0;
+  }
+  if (Math.abs(next - goal) < 1e-4 && Math.abs(velocity.current) < 1e-3) {
+    velocity.current = 0;
+    return goal;
+  }
+  return next;
+}
+
 function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
   const side = SIDE;
   const size = useThree((state) => state.size);
@@ -87,6 +115,7 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
   const points = useRef<THREE.Group>(null);
   const anchors = useRef<number[]>([]);
   const position = useRef(0);
+  const positionVelocity = useRef(0);
   const lastScroll = useRef(0);
   const velocity = useRef(0);
   const burst = useRef(0);
@@ -188,7 +217,7 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     const viewport = window.innerHeight;
 
     const goal = walkPosition(scroll, anchors.current, viewport);
-    position.current = THREE.MathUtils.damp(position.current, goal, 5, delta);
+    position.current = follow(position.current, goal, positionVelocity, delta);
     const from = Math.min(Math.floor(position.current), stops.length - 1);
     const to = Math.min(from + 1, stops.length - 1);
     const mix = position.current - from;
