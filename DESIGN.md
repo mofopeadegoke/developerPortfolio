@@ -136,7 +136,7 @@ The form runs only on large screens with a mouse or trackpad. Everywhere else th
 - One form, one set of particles, rebuilt rather than replaced at each stop.
 - One colour family of copper, amber and ember glow on a warm near-black.
 - Text directly on the dark ground, with no panels or cards.
-- A form that answers the visitor: it parts round the cursor, bursts on a click, and streaks on a fast scroll.
+- A form that answers the visitor: it parts round the cursor and bursts on a click.
 - Two rendering tiers and a list view, all carrying the same words.
 
 ## Colors
@@ -257,7 +257,7 @@ The signature component: one point cloud, drawn with `react-three-fiber`, that t
 - **Pour:** Points leave at different moments according to a per-point seed. In transit the form draws in by up to half, swirls round its vertical axis, and heats toward Ember Hot, so a shape pours into the next instead of fading or scattering.
 - **Cursor:** The form parts around a mouse pointer like a finger through liquid, and the points it touches heat up. Any pointer tilts the form slightly (up to 0.25 radians across, 0.15 down).
 - **Burst:** A click or tap on empty space throws the form apart from that spot, and it settles back on its own. Clicks on links, buttons, headings, paragraphs, list items and table cells are ignored, so selecting text never sets it off.
-- **Streak:** Fast scrolling stretches the points vertically into streaks, in proportion to scroll speed.
+- **Scroll:** Scrolling never blurs or stretches the form. It follows the scroll closely and stays sharp at any speed.
 - **Backdrop:** A slow `shadergradient` plane of Ground, Smoulder and Char, rendered off-screen at 384px on every third frame and dimmed.
 
 **The Same Matter Rule.** There is one form and one set of points. A new piece of the site is a new shape for those points, never a second object, model or scene.

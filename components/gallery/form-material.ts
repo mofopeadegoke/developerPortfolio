@@ -11,7 +11,7 @@ const vertexShader = /* glsl */ `
   uniform highp sampler2DArray uShapes;
   uniform highp sampler2DArray uNormals;
   uniform float uPre;
-  uniform float uFrom, uTo, uMix, uTime, uBurst, uVelocity, uSize, uMaxSize, uSide, uRest, uBoost;
+  uniform float uFrom, uTo, uMix, uTime, uBurst, uSize, uMaxSize, uSide, uRest, uBoost;
   uniform float uTunnel, uTunnelX, uTunnelScale, uClear;
   uniform vec3 uPointer, uOrigin;
   attribute float aSeed;
@@ -102,8 +102,6 @@ const vertexShader = /* glsl */ `
     vec3 thrown = normalize(world.xyz - uOrigin + vec3(f, 0.2));
     world.xyz += thrown * uBurst * (0.5 + aSeed * 3.2);
 
-    // Fast scrolling stretches it into streaks.
-    world.y += uVelocity * (aSeed - 0.5) * 3.0;
 
     vec4 view = viewMatrix * world;
     // The depth pass sits just behind the surface, so the front of a model
@@ -167,7 +165,6 @@ export function createFormMaterial(side: number) {
       uMix: { value: 0 },
       uTime: { value: 0 },
       uBurst: { value: 0 },
-      uVelocity: { value: 0 },
       uDim: { value: 1 },
       uAlpha: { value: 1 },
       uRest: { value: 0.03 },

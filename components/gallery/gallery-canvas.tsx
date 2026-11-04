@@ -116,8 +116,6 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
   const anchors = useRef<number[]>([]);
   const position = useRef(0);
   const positionVelocity = useRef(0);
-  const lastScroll = useRef(0);
-  const velocity = useRef(0);
   const burst = useRef(0);
   const pointerGoal = useRef(new THREE.Vector3(99, 99, 0));
   const tilt = useRef({ x: 0, y: 0 });
@@ -258,11 +256,6 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     const sway = THREE.MathUtils.lerp(0.06, 0.16, THREE.MathUtils.smoothstep(position.current, 0, 1));
     form.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * sway + tilt.current.x * 0.35;
     form.rotation.x = tilt.current.y * 0.22;
-
-    const speed = (scroll - lastScroll.current) / Math.max(delta, 0.008) / 3000;
-    lastScroll.current = scroll;
-    velocity.current = THREE.MathUtils.damp(velocity.current, THREE.MathUtils.clamp(speed, -1, 1), 7, delta);
-    uniforms.uVelocity.value = velocity.current;
 
     burst.current = THREE.MathUtils.damp(burst.current, 0, 2.6, delta);
     uniforms.uBurst.value = burst.current;
