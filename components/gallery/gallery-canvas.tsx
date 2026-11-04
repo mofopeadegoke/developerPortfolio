@@ -115,6 +115,9 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
   const { material, glow, depth } = useMemo(() => createFormMaterial(side), [side]);
   const [ready, setReady] = useState(false);
   const [shed, setShed] = useState(0);
+  // The same level, readable inside callbacks, so effects run outside React's
+  // state updates.
+  const shedLevel = useRef(0);
 
   const points = useRef<THREE.Group>(null);
   const anchors = useRef<number[]>([]);
@@ -307,13 +310,13 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
       <PerformanceMonitor
         bounds={() => [22, 55]}
         flipflops={Infinity}
-        onDecline={() =>
-          setShed((level) => {
-            if (level === 0) setDpr(1);
-            if (level >= 2) onFallback();
-            return level + 1;
-          })
-        }
+        onDecline={() => {
+          const level = shedLevel.current;
+          shedLevel.current = level + 1;
+          if (level === 0) setDpr(1);
+          if (level >= 2) onFallback();
+          setShed(level + 1);
+        }}
       />
       {ready && (
         <group ref={points}>
