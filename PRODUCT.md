@@ -16,33 +16,32 @@ A personal portfolio that earns trust in Daniel's work and leads visitors to dow
 
 ## Positioning
 
-A recent software engineering graduate who owned frontend architecture for production apps and also works below the UI, in C++ and AI tooling. Every claim is backed by shipped work.
+A software engineering graduate (High Honors, 2026) who owned frontend architecture for production apps, gets pull requests merged into open-source AI tooling, and works below the UI in C++. Every claim is backed by shipped work.
 
 ## Capabilities and Constraints
 
-- All site copy lives in `lib/content.ts` and must stay consistent with `public/daniel master resume.pdf`.
-- Sections: hero, experience, projects, skills, about, contact. CV download and email are the primary actions.
+- All site copy lives in `lib/content.ts`. Facts follow `public/daniel master resume.pdf`; the site may carry true detail the one-page resume cuts for space. Where they conflict, the resume wins, except the year Daniel started coding: **2020** (the Nov 2026 PDF says 2021 and is due to be corrected).
+- Sections, in order: hero, Work, Open source, Experience, Skills, About, Competitions, Contact. CV download and email are the primary actions.
 - Next.js 16 and React 19, deployed on Vercel.
-- This redesign is an experiment on the `experiment/liquid-redesign` branch.
 
 ## Brand Commitments
 
-- The involute gear is no longer the site's identity. A gear appears only as the Gear Library project's own exhibit.
-- The theme is one colour family, Molten Copper, on near-black. Several bright, contrasting colours were rejected by the user.
-- 3D must be the main event on desktop and respond to the visitor, not decoration beside the content. It shows only the name and numbers the page proves (2020, 4,000+, top 5%, 3.81, 0.1%), never pictures of the work.
-- Phones and tablets get no 3D at all: a clean, fast page with the same numbers set as type.
-- The visual materials come from react-three-fiber, shadergradient and liquid-logo. liquid-glass-js is not used in this direction.
+- Editorial engineer with a technical instrument's micro-labels. Warm monochrome on near-black with copper as the single accent.
+- The copper particle form appears only in the hero, where it spells the name, then pours out into a sparse silver star field that stays behind the page. It never draws pictures of the work.
+- Each section states one number its words prove, set as giant type that counts up: Top 10 (open source), 2020, Top 5%, 3.81, 0.5%.
+- Phones and tablets get no WebGL: the name is set as giant type instead.
+- Square interface. No pills, rounded cards, glow or drop shadows.
 
 ## Evidence on Hand
 
-Project links, install counts, competition results and test figures in `lib/content.ts`. There are no testimonials, client logos or project screenshots in the repo, and none may be invented.
+Project links, install counts, competition results, merged pull request links and test figures in `lib/content.ts`. Real captures of live projects live in `public/work/` (Smart Bookmarks, Wormhole). There are no testimonials or client logos, and none may be invented. Do not use the Inscribe Edge Add-ons page as a capture: it shows one store's user count, not the 4,000+ installs total. The Uncooked site (uncooked-plugin.vercel.app) was down (404) in Nov 2026; add its link and a capture back once it is redeployed.
 
 ## Product Principles
 
-- A hiring visitor reaches the facts without waiting on an effect.
+- A hiring visitor reaches the facts without waiting on an effect. No preloader.
 - Show proof, not adjectives.
 - Never overstate a claim: the honesty of Uncooked applies to the portfolio too.
 
 ## Accessibility & Inclusion
 
-Content must stay readable without WebGL. The form runs only at 1024px and wider with a mouse or trackpad, and never when WebGL2 is missing or reduced motion is requested.
+Every word is server-rendered and readable without JavaScript or WebGL. Motion only hides content once the script runs (`html.js`). The form runs only at 1024px and wider with a fine pointer, WebGL2 and no reduced-motion request. Reduced motion turns off the entrance, reveals, count-ups, smooth wheel, magnetic hover and stacking scale.

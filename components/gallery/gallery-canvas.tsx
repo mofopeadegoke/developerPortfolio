@@ -5,7 +5,7 @@ import { Canvas, createPortal, useFrame, useThree } from "@react-three/fiber";
 import { PerformanceMonitor, useFBO } from "@react-three/drei";
 import { ShaderGradient } from "@shadergradient/react";
 import * as THREE from "three";
-import { CAMERA_DISTANCE, CAMERA_FOV, formLayout, stops, textBand, walkPosition, type Stop } from "@/lib/gallery";
+import { CAMERA_DISTANCE, CAMERA_FOV, formLayout, stops, walkPosition, type Stop } from "@/lib/gallery";
 import { buildShapes } from "@/components/gallery/form-shapes";
 import { createFormMaterial } from "@/components/gallery/form-material";
 
@@ -73,7 +73,9 @@ type FormProps = { tunnel: boolean; onTunnelEnd: () => void; onFallback: () => v
 const SIDE = 300;
 
 // Letters hold still enough to read, and stars hold still entirely.
-const restMotion = (stop: Stop) => (stop.form === "rest" ? 0 : stop.form === "name" ? 0.005 : 0.008);
+const restMotion = (stop: Stop) => (stop.form === "rest" ? 0 : 0.005);
+// Past this position the form is mostly stars, and the tunnel may run.
+const FIELD = 0.6;
 // How far the nearest stars slide per screen scrolled, in the dust's own units.
 const DRIFT = 0.12;
 
@@ -183,21 +185,18 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
 
   useEffect(() => {
     const measure = () => {
-      // A shape is complete when its section's words sit in the middle of the
-      // screen, or, for words taller than the screen, as the section arrives
-      // under the navigation bar, where its link scrolls to. Never past the
-      // ends of the page and always in page order.
-      const viewport = window.innerHeight;
-      const end = Math.max(0, document.documentElement.scrollHeight - viewport);
+      // A shape is complete as its section arrives under the navigation bar,
+      // where its link scrolls to: the name at the top of the page, the stars
+      // as the first section after the hero reaches the top. Never past the
+      // end of the page and always in page order.
+      const end = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
       const navigation = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
       let previous = 0;
       anchors.current = stops.map((stop) => {
         const section = document.querySelector(`[data-stop="${stop.id}"]`);
         if (!section) return previous;
-        const box = (section.querySelector(".plate") ?? section).getBoundingClientRect();
-        const middle = box.top + box.height / 2 + window.scrollY - viewport / 2;
         const arrival = section.getBoundingClientRect().top + window.scrollY - navigation;
-        previous = Math.max(previous, Math.min(end, middle, arrival));
+        previous = Math.max(previous, Math.min(end, arrival));
         return previous;
       });
     };
@@ -238,7 +237,7 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     const scroll = window.scrollY;
     const viewport = window.innerHeight;
 
-    const goal = walkPosition(scroll, anchors.current, viewport);
+    const goal = walkPosition(scroll, anchors.current);
     position.current = follow(position.current, goal, positionVelocity, delta);
     const from = Math.min(Math.floor(position.current), stops.length - 1);
     const to = Math.min(from + 1, stops.length - 1);
@@ -249,11 +248,6 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     uniforms.uTime.value += Math.min(delta, 0.05);
     uniforms.uRest.value = THREE.MathUtils.lerp(restMotion(stops[from]), restMotion(stops[to]), mix);
     uniforms.uDrift.value = (scroll / viewport) * DRIFT;
-    // Stars dim where the words are.
-    const bandFrom = textBand(stops[from], size.width);
-    const bandTo = textBand(stops[to], size.width);
-    uniforms.uTextMin.value = THREE.MathUtils.lerp(bandFrom.min, bandTo.min, mix);
-    uniforms.uTextMax.value = THREE.MathUtils.lerp(bandFrom.max, bandTo.max, mix);
 
     // Point sizes are in drawing pixels, so they follow the live pixel ratio.
     const ratio = state.gl.getPixelRatio();
@@ -264,17 +258,14 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     depth.uniforms.uSize.value = 50 * ratio;
     depth.uniforms.uMaxSize.value = 18 * ratio;
 
-    const wormhole = stops.findIndex((stop) => stop.id === "wormhole");
-    // The tunnel only ever runs on request, and ends when the visitor leaves.
-    const atWormhole = Math.abs(position.current - wormhole) < 0.6;
-    if (tunnelGoal.current && !atWormhole) {
+    // The tunnel only ever runs on request, in the star field, and ends when
+    // the visitor scrolls back into the hero.
+    if (tunnelGoal.current && position.current < FIELD) {
       tunnelGoal.current = false;
       onTunnelEnd();
     }
     tunnelAmount.current = THREE.MathUtils.damp(tunnelAmount.current, tunnelGoal.current ? 1 : 0, 2.5, delta);
     uniforms.uTunnel.value = tunnelAmount.current < 0.002 ? 0 : tunnelAmount.current;
-    uniforms.uTunnelX.value = formLayout(stops[wormhole], size.width, size.height).x;
-    uniforms.uClear.value = uniforms.uTunnel.value;
     // The tunnel spreads the same particles over the whole screen.
     uniforms.uBoost.value = 1 + uniforms.uTunnel.value * 1.5;
 
@@ -282,7 +273,7 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     const b = formLayout(stops[to], size.width, size.height);
     form.position.set(THREE.MathUtils.lerp(a.x, b.x, mix), THREE.MathUtils.lerp(a.y, b.y, mix), 0);
     form.scale.setScalar(THREE.MathUtils.lerp(a.scale, b.scale, mix));
-    // A slow sway and the pointer turn the form, never so far a number misreads.
+    // A slow sway and the pointer turn the form, never so far the name misreads.
     // Stars never sway, so the sky holds still.
     const starry = THREE.MathUtils.lerp(stops[from].form === "rest" ? 1 : 0, stops[to].form === "rest" ? 1 : 0, mix);
     const sway = THREE.MathUtils.lerp(0.06, 0.16, THREE.MathUtils.smoothstep(position.current, 0, 1)) * (1 - starry);
@@ -299,7 +290,6 @@ function Form({ tunnel, onTunnelEnd, onFallback, onReady }: FormProps) {
     uniforms.uPointer.value.lerp(pointerGoal.current, 1 - Math.exp(-9 * delta));
 
     // The form only reaches the words while it travels, so it steps back then.
-    // Stars dim themselves where they lie behind the words.
     const dim = 1 - Math.sin(Math.PI * mix) * 0.62;
     uniforms.uDim.value = THREE.MathUtils.damp(uniforms.uDim.value, dim, 6, delta);
   });

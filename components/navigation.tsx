@@ -1,77 +1,86 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
-import { useGalleryView } from "@/components/gallery/gallery-stage";
+import { useEffect, useState } from "react";
 import { LinkButton } from "@/components/link-button";
-import { profile } from "@/lib/content";
+import { profile, sections } from "@/lib/content";
 
-const links = [
-  { id: "experience", label: "Experience" },
-  { id: "projects", label: "Projects" },
-  { id: "skills", label: "Skills" },
-  { id: "about", label: "About" },
-  { id: "contact", label: "Contact" },
-];
+const links = sections.map((section, index) => ({ ...section, number: String(index + 1).padStart(2, "0") })).filter((section) => section.id !== "awards");
 
 export function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { view, toggleView } = useGalleryView();
-  const viewLabel = view === "list" ? "3D view" : "List view";
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    const onResize = () => {
+      if (window.innerWidth >= 1024) setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [menuOpen]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-rule bg-ground">
-      <nav aria-label="Main" className="flex h-14 items-center justify-between px-[var(--gutter)]">
-        <a href="#top" className="font-display text-lg font-extrabold tracking-[-0.01em] [font-stretch:115%]">
+    <header className="nav enter-fade" data-open={menuOpen || undefined} style={{ ["--d" as string]: "0ms" }}>
+      <nav aria-label="Main" className="flex h-full items-center justify-between gap-6 px-[var(--gutter)]">
+        <a href="#top" className="flex items-baseline gap-2 font-display text-lg font-extrabold tracking-[-0.02em] [font-variation-settings:'wdth'_112]">
           {profile.name}
         </a>
 
-        <div className="hidden items-center gap-5 lg:flex">
-          <ul className="flex items-center gap-5">
+        <div className="hidden items-center gap-8 lg:flex">
+          <ul className="flex items-center gap-7">
             {links.map((link) => (
               <li key={link.id}>
-                <a href={`#${link.id}`} className="py-2 text-[0.95rem] text-quiet transition-colors hover:text-text">
+                <a href={`#${link.id}`} className="nav-link">
                   {link.label}
+                  <sup>{link.number}</sup>
                 </a>
               </li>
             ))}
           </ul>
-          <button type="button" onClick={toggleView} className="view-toggle py-2 text-[0.95rem] font-medium underline decoration-copper underline-offset-4 transition-colors hover:text-amber">
-            {viewLabel}
-          </button>
-          <LinkButton href={profile.resume} download={profile.resumeFileName} className="px-4 py-2 text-sm">
+          <LinkButton href={profile.resume} download={profile.resumeFileName} size="sm">
             Download CV
           </LinkButton>
         </div>
 
-        <div className="flex items-center gap-3 lg:hidden">
-          <button type="button" onClick={toggleView} className="view-toggle py-2 text-sm font-medium underline decoration-copper underline-offset-4">
-            {viewLabel}
-          </button>
-          <button
-            type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            className="grid h-11 w-11 place-items-center"
-          >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-menu"
+          className="mono -mr-2 grid h-11 min-w-11 place-items-center px-2 text-[0.8125rem] text-text lg:hidden"
+        >
+          {menuOpen ? "Close" : "Menu"}
+        </button>
       </nav>
+      <span aria-hidden="true" className="nav-progress" />
 
       {menuOpen && (
-        <div id="mobile-menu" className="border-t border-rule lg:hidden">
-          <ul className="flex flex-col px-[var(--gutter)] py-3">
-            {links.map((link) => (
-              <li key={link.id}>
-                <a href={`#${link.id}`} onClick={() => setMenuOpen(false)} className="block py-2.5 font-display text-2xl font-bold">
+        <div id="mobile-menu" className="menu-panel lg:hidden">
+          <ul className="flex flex-col">
+            {links.map((link, index) => (
+              <li key={link.id} style={{ ["--i" as string]: index }} className="border-b border-rule">
+                <a
+                  href={`#${link.id}`}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-baseline justify-between py-3 font-display text-[clamp(2rem,9vw,3rem)] font-extrabold leading-none tracking-[-0.04em] [font-variation-settings:'wdth'_112]"
+                >
                   {link.label}
+                  <span className="mono text-faint">{link.number}</span>
                 </a>
               </li>
             ))}
-            <li className="pt-3 pb-2">
+          </ul>
+          <ul>
+            <li style={{ ["--i" as string]: links.length }}>
               <LinkButton href={profile.resume} download={profile.resumeFileName} className="w-full">
                 Download CV
               </LinkButton>
