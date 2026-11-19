@@ -12,21 +12,21 @@ const vertexShader = /* glsl */ `
   uniform highp sampler2DArray uNormals;
   uniform float uPre;
   uniform float uFrom, uTo, uMix, uTime, uBurst, uVelocity, uSize, uMaxSize, uSide, uRest, uBoost;
-  uniform float uTunnel, uTunnelX, uTunnelScale, uClear;
-  uniform float uDrift, uTextMin, uTextMax, uHalo;
+  uniform float uTunnel, uTunnelScale;
+  uniform float uDrift, uHalo;
   uniform vec3 uPointer, uOrigin;
   attribute float aSeed;
   varying float vShade;
   varying float vHeat;
   varying float vFade;
   varying float vStar;
-  varying float vGlint;
-  varying float vCore;
 
   // About one point in 45 stays lit as a star; the rest fade out between numbers.
   const float STARS = 0.022;
   // The share of points that fly as streaks through the wormhole.
   const float TUNNEL_STARS = 0.15;
+  // How bright a star stays under the page's words.
+  const float BEHIND_TEXT = 0.35;
 
   vec2 liquidFlow(vec3 p, float t) {
     vec2 v = p.xy * 1.15 + p.z * 0.6;
@@ -94,7 +94,6 @@ const vertexShader = /* glsl */ `
       float angle = aSeed * 6283.0;
       float radius = (1.5 + fract(aSeed * 91.7) * 1.1 + sin(run * 9.0 + uTime * 0.4) * 0.2) * uTunnelScale;
       vec3 tunnel = vec3(cos(angle) * radius, sin(angle) * radius, 9.0 - run * 36.0);
-      tunnel.x += uTunnelX * smoothstep(0.1, 0.9, run);
       tunnel.xy += vec2(sin(run * 5.0 + uTime * 0.2), cos(run * 4.0 - uTime * 0.15)) * run * 1.8 * uTunnelScale;
       world.xyz = mix(world.xyz, tunnel, uTunnel);
       fade = mix(fade, smoothstep(9.0, 5.0, tunnel.z), uTunnel);
@@ -130,30 +129,20 @@ const vertexShader = /* glsl */ `
     gl_Position = projectionMatrix * view;
     gl_PointSize = clamp(uSize * uBoost * (0.6 + aSeed * 0.8) / max(-view.z, 0.5), uSize * 0.055, uMaxSize);
 
-    // Each star pulses at its own pace, every two to five seconds. The
-    // brightest few flash a cross as they peak, but never behind the words.
-    float ndcX = gl_Position.x / gl_Position.w;
-    float behindText = smoothstep(uTextMin - 0.04, uTextMin + 0.04, ndcX) * (1.0 - smoothstep(uTextMax - 0.04, uTextMax + 0.04, ndcX));
+    // Each star pulses at its own pace, every two to five seconds.
     float pace = 1.26 + fract(aSeed * 53.7) * 1.88;
     float pulse = 0.5 + 0.5 * sin(uTime * pace + aSeed * 628.0);
-    // A star that can glint always draws on a larger sprite, so its core keeps
-    // the same size while only the arms fade in and out.
-    float glinter = step(0.96, fract(aSeed * 311.9)) * (1.0 - uTunnel);
     float pixel = uSize / 21.0;
     float body = pixel * (1.6 + fract(aSeed * 71.3) * 1.8);
-    float sprite = body + glinter * pixel * 16.0;
-    gl_PointSize = mix(gl_PointSize, sprite, star * (1.0 - uTunnel));
+    gl_PointSize = mix(gl_PointSize, body, star * (1.0 - uTunnel));
     vStar = star;
-    vGlint = glinter * smoothstep(0.82, 1.0, pulse) * (1.0 - behindText) * star;
-    vCore = 0.5 * body / sprite;
 
-    // The tunnel fills the screen, so it stays clear of the words' side.
-    float clear = uClear * smoothstep(-0.05, 0.25, gl_Position.x / gl_Position.w);
-    vFade = fade * (1.0 - clear * 0.88);
+    vFade = fade;
     vShade = fract(mix(a.w, b.w, step(0.5, t))) / 0.99;
-    // Stars glow without the warm halo pass, and dim behind the words.
+    // Stars glow without the warm halo pass, and stay dim everywhere: words run
+    // across the whole page above them.
     float twinkle = mix(1.0, 0.35 + 0.65 * pulse, 1.0 - uTunnel);
-    vFade *= mix(1.0, twinkle * mix(1.0, 0.35, behindText) * (1.0 - uHalo * (1.0 - uTunnel)), star);
+    vFade *= mix(1.0, twinkle * mix(1.0, BEHIND_TEXT, 1.0 - uTunnel) * (1.0 - uHalo * (1.0 - uTunnel)), star);
 
     // Light the model live, and fade the side turned away from the viewer.
     float solid = (1.0 - travel) * (1.0 - uTunnel);
@@ -178,8 +167,6 @@ const fragmentShader = /* glsl */ `
   varying float vHeat;
   varying float vFade;
   varying float vStar;
-  varying float vGlint;
-  varying float vCore;
 
   // Silver, warmed slightly so it sits on the warm ground: #dfe3ea.
   const vec3 SILVER = vec3(0.875, 0.89, 0.918);
@@ -194,11 +181,8 @@ const fragmentShader = /* glsl */ `
     colour = mix(colour, vec3(1.0, 0.86, 0.62), shade * shade * shade * 0.75 + vHeat * 0.35);
     float alpha = soft * (0.16 + 0.84 * shade + vHeat * 0.25);
 
-    // A star is a soft core; a glinting one adds four thin arms that taper to
-    // the edge of its larger sprite.
-    float core = smoothstep(vCore, vCore * 0.16, d);
-    float arms = (exp(-abs(q.y) * 32.0) + exp(-abs(q.x) * 32.0)) * (1.0 - d * 2.0) * vGlint;
-    float starAlpha = min(1.0, core * 0.9 + arms);
+    // A star is a soft core.
+    float starAlpha = smoothstep(0.5, 0.08, d) * 0.9;
     colour = mix(colour, SILVER, vStar);
     alpha = mix(alpha, starAlpha, vStar);
     gl_FragColor = vec4(colour, alpha * uDim * uAlpha * uBoost * vFade);
@@ -227,12 +211,8 @@ export function createFormMaterial(side: number) {
       uRest: { value: 0.03 },
       uBoost: { value: 1 },
       uTunnel: { value: 0 },
-      uTunnelX: { value: 0 },
       uTunnelScale: { value: 1 },
-      uClear: { value: 0 },
       uDrift: { value: 0 },
-      uTextMin: { value: 2 },
-      uTextMax: { value: 2 },
       uHalo: { value: 0 },
       uSide: { value: side },
       uSize: { value: 21 },

@@ -3,11 +3,10 @@ import { FontLoader, type Font } from "three/examples/jsm/loaders/FontLoader.js"
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { proofs } from "@/lib/content";
 import { stops, type Stop } from "@/lib/gallery";
 
-// The form only ever takes three kinds of shape: the name, a number that the
-// words beside it prove, and loose dust at rest between them. Letters are solid:
+// The form only ever takes two shapes: the name in the hero, and loose stars at
+// rest behind the rest of the page. Letters are solid:
 // every point keeps its surface normal, so the shader can light it live and hide
 // the side facing away.
 
@@ -98,10 +97,8 @@ function fillLayer(data: Float32Array, normals: Float32Array, layer: number, cou
   }
 }
 
-function partsFor(stop: Stop, font: Font, name: () => THREE.BufferGeometry): Part[] {
-  if (stop.form === "rest") return [dust];
-  if (stop.form === "name") return [{ share: 1, geometry: name() }];
-  return [{ share: 1, geometry: normalise(word(font, proofs[stop.id].figure.toUpperCase(), 1)) }];
+function partsFor(stop: Stop, name: () => THREE.BufferGeometry): Part[] {
+  return stop.form === "rest" ? [dust] : [{ share: 1, geometry: name() }];
 }
 
 /**
@@ -116,7 +113,7 @@ export async function buildShapes(side: number, onFirst: (data: Float32Array, no
   const name = () => normalise(word(font, "DANIEL ADEGOKE", 1));
 
   for (let layer = 0; layer < stops.length; layer++) {
-    fillLayer(data, normals, layer, count, partsFor(stops[layer], font, name));
+    fillLayer(data, normals, layer, count, partsFor(stops[layer], name));
     if (layer === 0) {
       // Until the rest arrive, every layer is the name, so the form shows now.
       for (let other = 1; other < stops.length; other++) {

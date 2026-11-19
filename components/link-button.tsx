@@ -1,19 +1,28 @@
-import type { AnchorHTMLAttributes } from "react";
+import type { AnchorHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type LinkButtonProps = AnchorHTMLAttributes<HTMLAnchorElement> & { variant?: "solid" | "outline" };
+type LinkButtonProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "children"> & {
+  variant?: "solid" | "outline";
+  size?: "sm";
+  /** Drifts toward the cursor on desktop. */
+  magnetic?: boolean;
+  icon?: ReactNode;
+  children: string;
+};
 
-export function LinkButton({ variant = "solid", className, ...props }: LinkButtonProps) {
+/** A square button whose label rolls on hover. */
+export function LinkButton({ variant = "solid", size, magnetic, icon, className, children, ...props }: LinkButtonProps) {
   return (
     <a
-      className={cn(
-        "inline-flex items-center justify-center gap-2 border px-5 py-3 font-medium transition-colors duration-200",
-        variant === "solid"
-          ? "border-copper bg-copper text-ground hover:border-amber hover:bg-amber"
-          : "border-copper bg-transparent text-text hover:bg-copper hover:text-ground",
-        className,
-      )}
+      data-magnetic={magnetic ? "0.22" : undefined}
+      className={cn("btn", variant === "solid" ? "btn-solid" : "btn-outline", size === "sm" && "btn-sm", className)}
       {...props}
-    />
+    >
+      <span className="roll">
+        <span>{children}</span>
+        <span aria-hidden="true">{children}</span>
+      </span>
+      {icon}
+    </a>
   );
 }

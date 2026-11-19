@@ -1,5 +1,5 @@
 // A few dozen silver points that twinkle behind the page wherever the form
-// does not run: phones, tablets, struggling desktops and the list view. The
+// does not run: phones, tablets and struggling desktops. The
 // positions come from a fixed seed, so the server and browser draw the same sky.
 
 const COUNT = 40;
